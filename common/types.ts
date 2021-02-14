@@ -5,3 +5,11 @@ export type Number = {
   bingo: boolean
   center: boolean
 }
+
+export type Room = {
+  id: string
+  name: string
+  number: string
+  history: string[]
+  gifts: string[]
+}

@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab'
 import { makeStyles } from '@material-ui/core/styles'
 import RedeemOutlinedIcon from '@material-ui/icons/RedeemOutlined'
 import PeopleAltOutlinedIcon from '@material-ui/icons/PeopleAltOutlined'
 import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faInfo } from '@fortawesome/free-solid-svg-icons'
+
+import MenuIcon from '@material-ui/icons/Menu'
+import ListIcon from '@material-ui/icons/List'
+import { BingoContext } from '../../contexts/BingoContext'
 
 const useStyles = makeStyles((theme) => ({
   speedDial: {
@@ -20,10 +22,8 @@ const useStyles = makeStyles((theme) => ({
 export default function FAB() {
   const classes = useStyles()
   const [fab, setFab] = useState(false)
-  const iconStyle: React.CSSProperties = {
-    fontSize: '20px',
-    color: 'rgb(255 243 243)',
-  }
+
+  const { setOpenHistoryDrawer } = useContext(BingoContext)
 
   return (
     <SpeedDial
@@ -31,8 +31,8 @@ export default function FAB() {
       className={classes.speedDial}
       icon={
         <SpeedDialIcon
-          icon={<FontAwesomeIcon style={iconStyle} icon={faInfo} />}
-          openIcon={<CloseOutlinedIcon style={{ marginLeft: '-8px' }} />}
+          icon={<MenuIcon htmlColor="#fff" />}
+          openIcon={<CloseOutlinedIcon />}
         />
       }
       open={fab}
@@ -40,6 +40,16 @@ export default function FAB() {
       onOpen={() => setFab(true)}
       direction="up"
     >
+      <SpeedDialAction
+        key="number history"
+        color="primary"
+        icon={<ListIcon />}
+        tooltipTitle={'抽選履歴'}
+        tooltipOpen
+        onClick={() => {
+          setOpenHistoryDrawer(true)
+        }}
+      />
       <SpeedDialAction
         key="show gift list"
         color="primary"

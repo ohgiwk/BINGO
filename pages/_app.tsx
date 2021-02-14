@@ -5,6 +5,7 @@ import { ThemeProvider, createMuiTheme, CssBaseline } from '@material-ui/core'
 import Layout from './Layout'
 import useFirebase from '../hooks/useFirebase'
 import { AppContextProvider } from '../contexts/AppContext'
+import { BingoContextProvider } from '../contexts/BingoContext'
 
 function MyApp({ Component, pageProps }) {
   const { initFirebase } = useFirebase()
@@ -13,7 +14,7 @@ function MyApp({ Component, pageProps }) {
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side')
     if (jssStyles) {
-      jssStyles.parentElement.removeChild(jssStyles)
+      jssStyles.parentElement?.removeChild(jssStyles)
     }
   }, [])
 
@@ -28,10 +29,12 @@ function MyApp({ Component, pageProps }) {
   return (
     <ThemeProvider theme={theme}>
       <AppContextProvider>
-        <CssBaseline />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <BingoContextProvider>
+          <CssBaseline />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </BingoContextProvider>
       </AppContextProvider>
     </ThemeProvider>
   )

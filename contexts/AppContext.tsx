@@ -4,7 +4,7 @@ import firebase from 'firebase'
 type SnackBarState = {
   open: boolean
   message?: string
-  type?: 'success' | 'error'
+  type?: 'success' | 'error' | 'info'
 }
 
 type ConfirmDialogState = {
