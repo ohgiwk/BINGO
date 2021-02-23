@@ -4,6 +4,7 @@ import * as MUI from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import firebase from 'firebase'
 import { useRouter } from 'next/router'
+import moment from 'moment'
 
 import { range, chunk, shuffle, wait } from '../../common/utils'
 import { Room } from '../../common/types'
@@ -148,17 +149,8 @@ export default function LotteryRoom() {
     return <LoadingView />
   } else if (isValidRoomId && room) {
     return (
-      <MainView
-        {...{
-          room,
-          numbers,
-          number,
-          open,
-          running,
-          onClick,
-          onClickStart,
-          onClickReset,
-        }}
+      // prettier-ignore
+      <MainView {...{ room, numbers, number, open, running, onClick, onClickStart, onClickReset }}
       />
     )
   } else {
@@ -182,17 +174,30 @@ const MainView: React.FC<{
 
   return (
     <MUI.Container className={classes.container} maxWidth="md">
-      <MUI.Typography className={classes.count}>
-        {`${room.history?.length ?? 0} / ${
-          props.numbers.filter((h) => h.value).length
-        }`}
-      </MUI.Typography>
-      <MUI.Typography
-        className={`
+      {room.status === 'started' ? (
+        <>
+          <MUI.Typography className={classes.count}>
+            {`${room.history?.length ?? 0} / ${
+              props.numbers.filter((h) => h.value).length
+            }`}
+          </MUI.Typography>
+          <MUI.Typography
+            className={`
         ${classes.number} ${room.status !== 'started' && classes.prepare}`}
-      >
-        {props.number}
-      </MUI.Typography>
+          >
+            {props.number}
+          </MUI.Typography>
+        </>
+      ) : (
+        <>
+          <MUI.Typography className={`${classes.title}`}>
+            {room.name}
+          </MUI.Typography>
+          <MUI.Typography className={classes.date}>
+            {moment(room.startDate).format('YYYY年MM月DD日hh時mm分〜')}
+          </MUI.Typography>
+        </>
+      )}
 
       {room.status !== 'started' ? (
         <MUI.Button
@@ -282,6 +287,13 @@ function playSE() {
 
 const useStyles = makeStyles((theme) => ({
   container: { paddingTop: '64px', textAlign: 'center' },
+  title: {
+    fontSize: '3rem',
+    fontWeight: 'bold',
+    color: '#444',
+    margin: '4rem 0 1rem',
+  },
+  date: { fontSize: '1.3rem', color: '#676767', margin: '0 0 0.9rem' },
   count: { fontSize: '1.3rem', color: 'gray', marginTop: '0.5rem' },
   number: { fontSize: '5rem', margin: '1.4rem 0 1rem' },
   dialogNumber: {
