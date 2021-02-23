@@ -19,16 +19,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function FAB() {
+export default function FAB(props: { className?: string }) {
   const classes = useStyles()
   const [fab, setFab] = useState(false)
 
-  const { setOpenHistoryDrawer } = useContext(BingoContext)
+  const { setOpenHistoryDrawer, setOpenGiftDrawer } = useContext(BingoContext)
 
   return (
     <SpeedDial
       ariaLabel="SpeedDial"
-      className={classes.speedDial}
+      className={`${classes.speedDial} ${props.className}`}
       icon={
         <SpeedDialIcon
           icon={<MenuIcon htmlColor="#fff" />}
@@ -56,7 +56,9 @@ export default function FAB() {
         icon={<RedeemOutlinedIcon />}
         tooltipTitle={'景品一覧'}
         tooltipOpen
-        onClick={() => {}}
+        onClick={() => {
+          setOpenGiftDrawer(true)
+        }}
       />
       <SpeedDialAction
         key="show user list"

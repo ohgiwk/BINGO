@@ -45,12 +45,12 @@ export default function DrawerMenu() {
         >
           <div>
             <List>
-              <Link href="/card">
+              <Link href="/rooms">
                 <ListItem button>
                   <ListItemIcon>
                     <HomeIcon />
                   </ListItemIcon>
-                  <ListItemText primary="ホーム" />
+                  <ListItemText primary="ルーム一覧" />
                 </ListItem>
               </Link>
 

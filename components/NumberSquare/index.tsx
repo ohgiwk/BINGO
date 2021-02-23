@@ -13,11 +13,12 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '50%',
     color: theme.palette.primary.main,
     background: '#fff',
-    transition: 'background 1s',
+    transition: 'color 0.5s, background 0.5s',
   },
   opened: {
     color: '#fff',
-    background: 'linear-gradient(45deg, #ff89a3 30%, #ff8e53 100%)',
+    background: '#ff89a3!important',
+    // background: 'linear-gradient(45deg, #ff89a3 30%, #ff8e53 100%)',
   },
   reach: {
     border: `solid 3px ${theme.palette.primary.main}`,

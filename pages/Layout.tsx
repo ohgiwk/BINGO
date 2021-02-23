@@ -7,6 +7,7 @@ import DrawerMenu from '../components/DrawerMenu'
 import SnackBar from '../components/SnackBar'
 import { AppContext } from '../contexts/AppContext'
 import useAuth from '../hooks/useAuth'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 const useStyles = makeStyles(() => ({
   title: {
@@ -18,10 +19,12 @@ const useStyles = makeStyles(() => ({
   },
 }))
 
-function Layout({ children }) {
+const Layout: React.FC = ({ children }) => {
   const classes = useStyles()
 
-  const { isAppLoading, snackBar, setSnackBar } = useContext(AppContext)
+  const { isAppLoading, snackBar, setSnackBar, confirmDialog } = useContext(
+    AppContext
+  )
   const { initAuth } = useAuth()
   initAuth()
 
@@ -37,11 +40,14 @@ function Layout({ children }) {
           </Toolbar>
         </AppBar>
 
+        <ConfirmDialog {...confirmDialog} />
+
         <SnackBar
           open={snackBar.open}
           message={snackBar.message}
           severity={snackBar.type}
           onClose={() => setSnackBar({ ...snackBar, open: false })}
+          vertical="top"
         />
         <main>{children}</main>
       </>

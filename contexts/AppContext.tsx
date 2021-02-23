@@ -31,7 +31,8 @@ interface State {
   snackBar: SnackBarState
   setSnackBar: React.Dispatch<React.SetStateAction<SnackBarState>>
   confirmDialog: ConfirmDialogState
-  setConfirmDialog: React.Dispatch<React.SetStateAction<ConfirmDialogState>>
+  openDialog: (args: Omit<ConfirmDialogState, 'open'>) => void
+  closeDialog: () => void
 }
 
 const AppContext = createContext<State>({} as State)
@@ -42,7 +43,23 @@ function AppContextProvider(props: { children?: React.ReactNode }) {
   const [isAuth, setIsAuth] = useState(false)
   const [currentUser, setCurrentUser] = useState<firebase.User | undefined>()
   const [snackBar, setSnackBar] = useState({ open: false })
-  const [confirmDialog, setConfirmDialog] = useState({ open: false })
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    open: false,
+  })
+
+  function openDialog(args: Omit<ConfirmDialogState, 'open'>) {
+    setConfirmDialog({
+      open: true,
+      ...args,
+    })
+  }
+
+  const closeDialog = () => {
+    setConfirmDialog((prevValue) => ({
+      ...prevValue,
+      open: false,
+    }))
+  }
 
   return (
     <AppContext.Provider
@@ -58,7 +75,8 @@ function AppContextProvider(props: { children?: React.ReactNode }) {
         snackBar,
         setSnackBar,
         confirmDialog,
-        setConfirmDialog,
+        openDialog,
+        closeDialog,
       }}
     >
       {props.children}

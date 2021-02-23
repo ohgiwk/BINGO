@@ -1,30 +1,36 @@
 import React, { createContext, useState } from 'react'
+import useLocalStorage from '../hooks/useLocalStorage'
 
 interface State {
-  numbers: Number[]
-  setNumbers: React.Dispatch<React.SetStateAction<Number[]>>
-  history: string[]
-  setHistory: React.Dispatch<React.SetStateAction<string[]>>
   openHistoryDrawer: boolean
   setOpenHistoryDrawer: React.Dispatch<React.SetStateAction<boolean>>
+  openGiftDrawer: boolean
+  setOpenGiftDrawer: React.Dispatch<React.SetStateAction<boolean>>
+  openPlayerDrawer: boolean
+  setOpenPlayerDrawer: React.Dispatch<React.SetStateAction<boolean>>
+  playerName: string
+  setPlayerName: React.Dispatch<React.SetStateAction<string>>
 }
 
 const BingoContext = createContext<State>({} as State)
 
 function BingoContextProvider(props: { children?: React.ReactNode }) {
-  const [numbers, setNumbers] = useState<Number[]>([])
-  const [history, setHistory] = useState<string[]>([])
   const [openHistoryDrawer, setOpenHistoryDrawer] = useState(false)
+  const [openGiftDrawer, setOpenGiftDrawer] = useState(false)
+  const [openPlayerDrawer, setOpenPlayerDrawer] = useState(false)
+  const [playerName, setPlayerName] = useLocalStorage('player', '')
 
   return (
     <BingoContext.Provider
       value={{
-        numbers,
-        setNumbers,
-        history,
-        setHistory,
         openHistoryDrawer,
         setOpenHistoryDrawer,
+        openGiftDrawer,
+        setOpenGiftDrawer,
+        openPlayerDrawer,
+        setOpenPlayerDrawer,
+        playerName,
+        setPlayerName,
       }}
     >
       {props.children}

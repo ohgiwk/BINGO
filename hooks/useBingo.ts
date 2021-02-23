@@ -3,21 +3,24 @@ import { chunk, shuffle, range, take, transpose, reverse } from '../common/utils
 
 import { Number } from '../common/types'
 export default function useBingo() {
-  function generateNumbers() {
-    const maxNumber = 75
-    const numOfNumbersOnCard = 25
-
-    const list = take(shuffle(range(maxNumber, 1)), numOfNumbersOnCard).map(
-      (n) => ({
-        open: false,
-        number: String(n),
-        reach: false,
-        bingo: false,
-        center: false,
-      })
+  function generateNumbers(maxNumber: number, numOfNumbersOnCard: number) {
+    return toCardNumbers(
+      take(shuffle(range(maxNumber, 1)), numOfNumbersOnCard).map((i) =>
+        String(i)
+      )
     )
+  }
 
-    list[Math.floor(numOfNumbersOnCard / 2)] = {
+  function toCardNumbers(numbers: string[]) {
+    const list = numbers.map((n) => ({
+      open: false,
+      number: String(n),
+      reach: false,
+      bingo: false,
+      center: false,
+    }))
+
+    list[Math.floor(list.length / 2)] = {
       open: true,
       number: '',
       reach: false,
@@ -96,5 +99,5 @@ export default function useBingo() {
     return result.flat()
   }
 
-  return { generateNumbers, checkBingo }
+  return { generateNumbers, toCardNumbers, checkBingo }
 }

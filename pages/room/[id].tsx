@@ -1,54 +1,66 @@
 import { useState, useEffect, useContext } from 'react'
 // prettier-ignore
-import { Button, ButtonGroup, Container, Typography } from '@material-ui/core'
+import { Button, ButtonGroup, CircularProgress, Container, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import firebase from 'firebase'
 import { useRouter } from 'next/router'
 
-import FAB from '../../components/FAB'
-import { BingoContext } from '../../contexts/BingoContext'
-import HistoryDrawer from '../../components/HistoryDrawer'
 import { range, chunk, shuffle } from '../../common/utils'
 import { Room } from '../../common/types'
+import useAPI from '../../hooks/useAPI'
+import FAB from '../../components/FAB'
+import HistoryDrawer from '../../components/HistoryDrawer'
+import GiftDrawer from '../../components/GiftDrawer'
+import RippleNumber from '../../components/RippleNumber'
+import { AppContext } from '../../contexts/AppContext'
 
 type Number = {
-  n: string
+  value: string
   open: boolean
 }
 
 export default function LotteryRoom() {
-  const classes = useStyles()
   const router = useRouter()
-  const { id: roomId } = router.query
-  const { history, setHistory } = useContext(BingoContext)
+  const { id: roomId } = router.query as { id: string }
+  const { updateRoom } = useAPI()
 
   const maxNumber = 75
+
+  const { openDialog, closeDialog } = useContext(AppContext)
+  const [room, setRoom] = useState<Room>()
   const [number, setNumber] = useState<string>('0')
   const [numbers, setNumbers] = useState<Number[]>(
     range(Math.ceil(maxNumber / 10) * 10, 1).map((n) => ({
-      n: n <= maxNumber ? String(n) : '',
+      value: n <= maxNumber ? String(n) : '',
       open: false,
     }))
   )
+  const [isValidRoomId, setIsValidRoomId] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [running, setRunning] = useState(false)
 
   useEffect(() => {
+    setIsLoading(true)
+
     const roomRef = firebase.database().ref('rooms/' + roomId)
     roomRef.on('value', (snapshot) => {
-      const { history } = snapshot.val() as Room
+      const room = snapshot.val() as Room
 
-      setNumbers(
-        numbers.map((n) => ({ ...n, open: history?.includes(n.n) ?? false }))
-      )
-      setHistory(history ?? [])
+      if (room) {
+        setNumbers(
+          numbers.map((n) => ({
+            ...n,
+            open: room.history?.includes(n.value) ?? false,
+          }))
+        )
+        setRoom(room)
+      } else {
+        setIsValidRoomId(false)
+      }
+
+      setIsLoading(false)
     })
   }, [])
-
-  function playSE() {
-    const player = document.createElement('audio')
-    player.src = '/drumroll.mp3'
-    player.play()
-  }
 
   const onClick = () => {
     setRunning(true)
@@ -57,7 +69,7 @@ export default function LotteryRoom() {
     new Promise<string>((resolve) => {
       let num = ''
       const list = shuffle(
-        numbers.filter((n) => !n.open && n.n).map((n) => n.n)
+        numbers.filter((n) => !n.open && n.value).map((n) => n.value)
       )
 
       const timer = setInterval(() => {
@@ -74,131 +86,188 @@ export default function LotteryRoom() {
       setNumbers(
         numbers.map((n) => ({
           ...n,
-          open: n.n === String(newNumber) ? true : n.open,
+          open: n.value === String(newNumber) ? true : n.open,
         }))
       )
 
-      firebase
-        .database()
-        .ref('rooms/' + roomId)
-        .set({
+      if (room) {
+        updateRoom(roomId, {
+          ...room,
           number: newNumber,
-          history: [...history, newNumber],
+          history: [...(room.history ?? []), newNumber],
         })
+      }
 
-      setHistory([...history, newNumber])
       setRunning(false)
     })
   }
 
-  function reset() {
-    firebase
-      .database()
-      .ref('rooms/' + roomId)
-      .set({
-        number: '0',
-        history: [],
+  function onClickStart() {
+    if (room) {
+      openDialog({
+        text: 'ビンゴを開始しますか？',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'キャンセル',
+        onClickPrimaryButton: () => {
+          updateRoom(roomId, { ...room, status: 'started' })
+          closeDialog()
+        },
+        onClickSecondaryButton: () => closeDialog(),
       })
-    setNumber('0')
+    }
   }
+
+  function onClickReset() {
+    openDialog({
+      title: '抽選をリセット',
+      text: 'リセットしてもよろしいですか？',
+      primaryButtonText: 'OK',
+      secondaryButtonText: 'キャンセル',
+      onClickPrimaryButton: () => {
+        if (room) {
+          updateRoom(roomId, { ...room, number: '0', history: [] })
+          setNumber('0')
+          closeDialog()
+        }
+      },
+      onClickSecondaryButton: () => closeDialog(),
+    })
+  }
+
+  if (isLoading) {
+    return <LoadingView />
+  } else if (isValidRoomId && room) {
+    return (
+      <MainView
+        {...{
+          room,
+          numbers,
+          number,
+          running,
+          onClick,
+          onClickStart,
+          onClickReset,
+        }}
+      />
+    )
+  } else {
+    return <NotFoundView />
+  }
+}
+
+const MainView: React.FC<{
+  room: Room
+  numbers: Number[]
+  number: string
+  running: boolean
+  onClick: () => void
+  onClickStart: () => void
+  onClickReset: () => void
+}> = (props) => {
+  const classes = useStyles()
+
+  const { room } = props
 
   return (
     <Container className={classes.container} maxWidth="md">
       <Typography className={classes.count}>
-        {history.length} / {numbers.filter((h) => h.n).length}
+        {`${room.history?.length ?? 0} / ${
+          props.numbers.filter((h) => h.value).length
+        }`}
       </Typography>
-      <Typography className={classes.number}>{number}</Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        className={classes.button}
-        onClick={onClick}
-        disabled={running}
+      <Typography
+        className={`
+        ${classes.number} ${room.status !== 'started' && classes.prepare}`}
       >
-        抽選する！
-      </Button>
+        {props.number}
+      </Typography>
 
-      <div className={classes.table}>
-        {chunk(numbers, 10).map((arr, i) => (
+      {room.status !== 'started' ? (
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={props.onClickStart}
+          disabled={props.running}
+        >
+          ビンゴを開始する！
+        </Button>
+      ) : (
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          onClick={props.onClick}
+          disabled={props.running}
+        >
+          抽選する！
+        </Button>
+      )}
+
+      <div
+        className={`
+        ${classes.table} ${room.status !== 'started' && classes.prepare}`}
+      >
+        {chunk(props.numbers, 10).map((arr, i) => (
           <div key={i} className={classes.numbers}>
             {arr.map((number, j) => (
-              <div
-                key={j}
-                className={`
-                  ${classes.num}
-                  ${number.open && classes.open}
-                  ${classes.ripple}
-                  ${number.open && classes.onRipple}
-                `}
-              >
-                {number.n}
-              </div>
+              <RippleNumber key={j} {...{ number }} />
             ))}
           </div>
         ))}
       </div>
-      <div className={classes.floatArea}>
-        <ButtonGroup variant="text" color="primary">
-          <Button onClick={reset}>リセット</Button>
-        </ButtonGroup>
-      </div>
 
-      <div className={classes.fab}>
-        <FAB />
+      {/* <div className={classes.floatArea}>
+        <ButtonGroup variant="text" color="primary">
+          <Button onClick={onClickReset}>リセット</Button>
+        </ButtonGroup>
+      </div> */}
+      <div className={classes.info}>
+        現在の参加人数: {room.players?.length ?? 0}人
       </div>
-      <HistoryDrawer history={history} />
+      {/* <div className={classes.info}>現在のビンゴ数: 1</div>
+      <div className={classes.info}>現在のリーチ数: 1</div> */}
+
+      <FAB className={classes.fab} />
+      <GiftDrawer gifts={room.gifts ?? []} />
+      <HistoryDrawer history={room.history ?? []} />
     </Container>
   )
+}
+
+function LoadingView() {
+  const classes = useStyles()
+  return <CircularProgress className={classes.loading} />
+}
+
+function NotFoundView() {
+  const classes = useStyles()
+
+  return (
+    <Container className={classes.container} maxWidth="md">
+      <div className={classes.roomNotFound}>ルームが見つかりません</div>
+      <Button variant="contained">TOPへ</Button>
+    </Container>
+  )
+}
+
+function playSE() {
+  const player = document.createElement('audio')
+  player.src = '/drumroll.mp3'
+  player.play()
 }
 
 const useStyles = makeStyles((theme) => ({
   container: { paddingTop: '64px', textAlign: 'center' },
   count: { fontSize: '1.3rem', color: 'gray', marginTop: '0.5rem' },
   number: { fontSize: '5rem', margin: '1.4rem 0 1rem' },
-  table: { margin: '2rem auto 0' },
+  table: { margin: '2rem auto 0', transition: 'opacity 0.3s' },
   numbers: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
     textAlign: 'left',
     marginTop: '0.7rem',
-  },
-  num: {
-    fontSize: '2rem',
-    color: 'gray',
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    lineHeight: '40px',
-    textAlign: 'center',
-    userSelect: 'none',
-  },
-  open: { color: theme.palette.primary.main },
-  ripple: {
-    position: 'relative',
-    '&:after': {
-      content: '""',
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      background: theme.palette.primary.main,
-      borderRadius: '50%',
-      width: 0,
-      height: 0,
-      opacity: 1,
-      transition: 'opacity 1s, width 1s, height 1s',
-    },
-  },
-  onRipple: {
-    '&:after': {
-      content: '',
-      width: '150px',
-      height: '150px',
-      opacity: 0,
-      transition: 'opacity 1s, width 1s, height 1s',
-      pointerEvents: 'none',
-    },
   },
   button: { fontWeight: 'bold', color: 'white' },
   floatArea: {
@@ -211,6 +280,10 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
   },
+  prepare: {
+    opacity: 0.5,
+  },
+  info: { marginTop: '1rem', color: '#676767' },
   fab: {
     opacity: 0,
     transition: 'opacity 0.5s',
@@ -218,4 +291,10 @@ const useStyles = makeStyles((theme) => ({
       opacity: 1,
     },
   },
+  roomNotFound: {
+    fontSize: '1.1rem',
+    marginTop: '30%',
+    marginBottom: '1rem',
+  },
+  loading: { position: 'absolute', top: '50%', left: '50%' },
 }))
