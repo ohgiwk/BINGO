@@ -14,6 +14,7 @@ import { AppContext } from '../../contexts/AppContext'
 import { BingoContext } from '../../contexts/BingoContext'
 import FAB from '../../components/FAB'
 import NumberSquare from '../../components/NumberSquare'
+import PlayerDrawer from '../../components/PlayerDrawer'
 import HistoryDrawer from '../../components/HistoryDrawer'
 import GiftDrawer from '../../components/GiftDrawer'
 import EntryDialog from '../../components/EntryDialog'
@@ -223,6 +224,7 @@ const View: React.FC<{
       />
 
       <FAB />
+      <PlayerDrawer players={room.players ?? []} />
       <GiftDrawer gifts={room.gifts ?? []} />
       <HistoryDrawer history={room.history ?? []} />
     </Container>

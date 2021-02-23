@@ -6,6 +6,14 @@ export type Number = {
   center: boolean
 }
 
+export type Player = {
+  name: string
+  message: string
+  numbers?: string[]
+  bingo?: number
+  reach?: number
+}
+
 export type Room = {
   id: string
   name: string
@@ -16,11 +24,5 @@ export type Room = {
   number: string
   history?: string[]
   gifts?: string[]
-  players?: {
-    name: string
-    message: string
-    numbers?: string[]
-    bingo?: number
-    reach?: number
-  }[]
+  players?: Player[]
 }

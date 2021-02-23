@@ -13,6 +13,7 @@ import HistoryDrawer from '../../components/HistoryDrawer'
 import GiftDrawer from '../../components/GiftDrawer'
 import RippleNumber from '../../components/RippleNumber'
 import { AppContext } from '../../contexts/AppContext'
+import PlayerDrawer from '../../components/PlayerDrawer'
 
 type Number = {
   value: string
@@ -229,6 +230,7 @@ const MainView: React.FC<{
       <div className={classes.info}>現在のリーチ数: 1</div> */}
 
       <FAB className={classes.fab} />
+      <PlayerDrawer players={room.players ?? []} />
       <GiftDrawer gifts={room.gifts ?? []} />
       <HistoryDrawer history={room.history ?? []} />
     </Container>

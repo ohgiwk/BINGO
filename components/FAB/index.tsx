@@ -9,21 +9,15 @@ import MenuIcon from '@material-ui/icons/Menu'
 import ListIcon from '@material-ui/icons/List'
 import { BingoContext } from '../../contexts/BingoContext'
 
-const useStyles = makeStyles((theme) => ({
-  speedDial: {
-    position: 'absolute',
-    '&.MuiSpeedDial-directionUp': {
-      bottom: theme.spacing(3),
-      right: theme.spacing(3),
-    },
-  },
-}))
-
 export default function FAB(props: { className?: string }) {
   const classes = useStyles()
   const [fab, setFab] = useState(false)
 
-  const { setOpenHistoryDrawer, setOpenGiftDrawer } = useContext(BingoContext)
+  const {
+    setOpenPlayerDrawer,
+    setOpenHistoryDrawer,
+    setOpenGiftDrawer,
+  } = useContext(BingoContext)
 
   return (
     <SpeedDial
@@ -32,7 +26,7 @@ export default function FAB(props: { className?: string }) {
       icon={
         <SpeedDialIcon
           icon={<MenuIcon htmlColor="#fff" />}
-          openIcon={<CloseOutlinedIcon />}
+          openIcon={<CloseOutlinedIcon htmlColor="#fff" />}
         />
       }
       open={fab}
@@ -41,7 +35,7 @@ export default function FAB(props: { className?: string }) {
       direction="up"
     >
       <SpeedDialAction
-        key="number history"
+        key="show_number_history"
         color="primary"
         icon={<ListIcon />}
         tooltipTitle={'抽選履歴'}
@@ -51,7 +45,7 @@ export default function FAB(props: { className?: string }) {
         }}
       />
       <SpeedDialAction
-        key="show gift list"
+        key="show_gift_list"
         color="primary"
         icon={<RedeemOutlinedIcon />}
         tooltipTitle={'景品一覧'}
@@ -61,12 +55,24 @@ export default function FAB(props: { className?: string }) {
         }}
       />
       <SpeedDialAction
-        key="show user list"
+        key="show_user_list"
         icon={<PeopleAltOutlinedIcon />}
         tooltipTitle={'参加者一覧'}
         tooltipOpen
-        onClick={() => {}}
+        onClick={() => {
+          setOpenPlayerDrawer(true)
+        }}
       />
     </SpeedDial>
   )
 }
+
+const useStyles = makeStyles((theme) => ({
+  speedDial: {
+    position: 'absolute',
+    '&.MuiSpeedDial-directionUp': {
+      bottom: theme.spacing(3),
+      right: theme.spacing(3),
+    },
+  },
+}))
