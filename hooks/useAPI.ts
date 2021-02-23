@@ -8,7 +8,7 @@ export default function useAPI() {
     return firebase
       .database()
       .ref('rooms/' + roomId)
-      .set({id: roomId, ...value})
+      .set({ id: roomId, ...value })
   }
 
   function updateRoom(roomId: string, value: Room) {

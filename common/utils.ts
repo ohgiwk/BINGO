@@ -45,3 +45,7 @@ export function deepCopy<T>(array: T[]): T[] {
 export function reverse<T>(array: T[]): T[] {
   return [...array].reverse()
 }
+
+export function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}

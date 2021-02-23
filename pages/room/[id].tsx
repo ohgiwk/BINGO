@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from 'react'
 // prettier-ignore
-import { Button, ButtonGroup, CircularProgress, Container, Typography } from '@material-ui/core'
+import * as MUI from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import firebase from 'firebase'
 import { useRouter } from 'next/router'
 
-import { range, chunk, shuffle } from '../../common/utils'
+import { range, chunk, shuffle, wait } from '../../common/utils'
 import { Room } from '../../common/types'
 import useAPI from '../../hooks/useAPI'
 import FAB from '../../components/FAB'
@@ -39,6 +39,7 @@ export default function LotteryRoom() {
   const [isValidRoomId, setIsValidRoomId] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [running, setRunning] = useState(false)
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     setIsLoading(true)
@@ -63,7 +64,10 @@ export default function LotteryRoom() {
     })
   }, [])
 
-  const onClick = () => {
+  const onClick = async () => {
+    setOpen(true)
+
+    await wait(1000)
     setRunning(true)
     playSE()
 
@@ -73,33 +77,38 @@ export default function LotteryRoom() {
         numbers.filter((n) => !n.open && n.value).map((n) => n.value)
       )
 
+      let i = 0
       const timer = setInterval(() => {
-        const random = Math.floor(Math.random() * list.length)
-        num = list[random]
+        num = list[i]
         setNumber(num)
+        i = i < list.length - 1 ? i + 1 : 0
       }, 50)
 
       setTimeout(() => {
         clearInterval(timer)
         resolve(num)
-      }, 3000)
+      }, 2500)
     }).then((newNumber) => {
-      setNumbers(
-        numbers.map((n) => ({
-          ...n,
-          open: n.value === String(newNumber) ? true : n.open,
-        }))
-      )
+      setTimeout(() => {
+        setRunning(false)
+        setOpen(false)
 
-      if (room) {
-        updateRoom(roomId, {
-          ...room,
-          number: newNumber,
-          history: [...(room.history ?? []), newNumber],
-        })
-      }
+        setNumbers(
+          numbers.map((n) => ({
+            ...n,
+            open: n.value === String(newNumber) ? true : n.open,
+          }))
+        )
 
-      setRunning(false)
+        if (room) {
+          // 抽選履歴の更新
+          updateRoom(roomId, {
+            ...room,
+            number: newNumber,
+            history: [...(room.history ?? []), newNumber],
+          })
+        }
+      }, 2000)
     })
   }
 
@@ -144,6 +153,7 @@ export default function LotteryRoom() {
           room,
           numbers,
           number,
+          open,
           running,
           onClick,
           onClickStart,
@@ -161,6 +171,7 @@ const MainView: React.FC<{
   numbers: Number[]
   number: string
   running: boolean
+  open: boolean
   onClick: () => void
   onClickStart: () => void
   onClickReset: () => void
@@ -170,21 +181,21 @@ const MainView: React.FC<{
   const { room } = props
 
   return (
-    <Container className={classes.container} maxWidth="md">
-      <Typography className={classes.count}>
+    <MUI.Container className={classes.container} maxWidth="md">
+      <MUI.Typography className={classes.count}>
         {`${room.history?.length ?? 0} / ${
           props.numbers.filter((h) => h.value).length
         }`}
-      </Typography>
-      <Typography
+      </MUI.Typography>
+      <MUI.Typography
         className={`
         ${classes.number} ${room.status !== 'started' && classes.prepare}`}
       >
         {props.number}
-      </Typography>
+      </MUI.Typography>
 
       {room.status !== 'started' ? (
-        <Button
+        <MUI.Button
           variant="contained"
           color="primary"
           className={classes.button}
@@ -192,9 +203,9 @@ const MainView: React.FC<{
           disabled={props.running}
         >
           ビンゴを開始する！
-        </Button>
+        </MUI.Button>
       ) : (
-        <Button
+        <MUI.Button
           variant="contained"
           color="primary"
           className={classes.button}
@@ -202,7 +213,7 @@ const MainView: React.FC<{
           disabled={props.running}
         >
           抽選する！
-        </Button>
+        </MUI.Button>
       )}
 
       <div
@@ -233,23 +244,33 @@ const MainView: React.FC<{
       <PlayerDrawer players={room.players ?? []} />
       <GiftDrawer gifts={room.gifts ?? []} />
       <HistoryDrawer history={room.history ?? []} />
-    </Container>
+
+      <MUI.Dialog open={props.open}>
+        <MUI.DialogContent
+          className={`${classes.dialogNumber} ${
+            props.running && classes.roulette
+          }`}
+        >
+          {props.number}
+        </MUI.DialogContent>
+      </MUI.Dialog>
+    </MUI.Container>
   )
 }
 
 function LoadingView() {
   const classes = useStyles()
-  return <CircularProgress className={classes.loading} />
+  return <MUI.CircularProgress className={classes.loading} />
 }
 
 function NotFoundView() {
   const classes = useStyles()
 
   return (
-    <Container className={classes.container} maxWidth="md">
+    <MUI.Container className={classes.container} maxWidth="md">
       <div className={classes.roomNotFound}>ルームが見つかりません</div>
-      <Button variant="contained">TOPへ</Button>
-    </Container>
+      <MUI.Button variant="contained">TOPへ</MUI.Button>
+    </MUI.Container>
   )
 }
 
@@ -263,6 +284,16 @@ const useStyles = makeStyles((theme) => ({
   container: { paddingTop: '64px', textAlign: 'center' },
   count: { fontSize: '1.3rem', color: 'gray', marginTop: '0.5rem' },
   number: { fontSize: '5rem', margin: '1.4rem 0 1rem' },
+  dialogNumber: {
+    fontSize: '20rem',
+    width: '500px',
+    height: '480px',
+    lineHeight: '480px',
+    textAlign: 'center',
+  },
+  roulette: {
+    animation: 'roulette 3s linear',
+  },
   table: { margin: '2rem auto 0', transition: 'opacity 0.3s' },
   numbers: {
     display: 'flex',
@@ -272,19 +303,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '0.7rem',
   },
   button: { fontWeight: 'bold', color: 'white' },
-  floatArea: {
-    boxShadow: '0 0 5px rgba(0,0,0, 0.3)',
-    borderRadius: '20px',
-    marginTop: '1rem',
-    opacity: 0,
-    transition: 'opacity 0.5s',
-    '&:hover': {
-      opacity: 1,
-    },
-  },
-  prepare: {
-    opacity: 0.5,
-  },
+  prepare: { opacity: 0.5 },
   info: { marginTop: '1rem', color: '#676767' },
   fab: {
     opacity: 0,

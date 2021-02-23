@@ -36,6 +36,21 @@ a {
   }
 }
 
+@keyframes roulette {
+  0% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0;
+  }
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 @keyframes slideGradient {
   0% {
     background-position: 0% 0%;
