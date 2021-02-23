@@ -3,6 +3,7 @@ import { useContext } from 'react'
 import { Drawer, List, ListItem, ListItemText, ListSubheader } from '@material-ui/core'
 import { BingoContext } from '../../contexts/BingoContext'
 import { makeStyles } from '@material-ui/core/styles'
+import { reverse } from '../../common/utils'
 
 interface Props {
   history: string[]
@@ -15,9 +16,7 @@ export default function HistoryDrawer({ history }: Props) {
     BingoContext
   )
 
-  const toggleDrawer = (val?: boolean) => {
-    setOpen(val ?? !open)
-  }
+  const toggleDrawer = (val?: boolean) => setOpen(val ?? !open)
 
   return (
     <Drawer anchor="right" open={open} onClose={() => toggleDrawer(false)}>
@@ -30,10 +29,10 @@ export default function HistoryDrawer({ history }: Props) {
         <div>
           <ListSubheader className={classes.header}>抽選履歴</ListSubheader>
           <List>
-            {history.map((h, i) => (
+            {reverse(history).map((h, i) => (
               <ListItem key={i} className={classes.item}>
                 <ListItemText>
-                  <span className={classes.no}>{i + 1}. </span>
+                  <span className={classes.no}>{history.length - i}. </span>
                   <span className={classes.number}>{h}</span>
                 </ListItemText>
               </ListItem>

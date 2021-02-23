@@ -42,6 +42,6 @@ export function deepCopy<T>(array: T[]): T[] {
   return JSON.parse(JSON.stringify(array))
 }
 
-export function reverse<T>(arr: T[]): T[] {
-  return arr.slice().reverse()
+export function reverse<T>(array: T[]): T[] {
+  return [...array].reverse()
 }
