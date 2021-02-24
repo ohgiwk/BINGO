@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RippleNumber Snapshot Test 1`] = `
+<div
+  className="
+        makeStyles-num-1
+        false
+        makeStyles-ripple-3
+        false
+      "
+>
+  0
+</div>
+`;
