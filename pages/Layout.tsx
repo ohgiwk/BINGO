@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import { ThemeProvider, createMuiTheme, CssBaseline } from '@material-ui/core'
 
 import AppLoading from '../components/AppLoading'
 import DrawerMenu from '../components/DrawerMenu'
@@ -19,6 +20,7 @@ const Layout: React.FC = ({ children }) => {
   const classes = useStyles()
 
   const {
+    primaryColor,
     isAppLoading,
     isLoading,
     snackBar,
@@ -28,9 +30,19 @@ const Layout: React.FC = ({ children }) => {
   const { initAuth } = useAuth()
   initAuth()
 
+  const theme = createMuiTheme({
+    palette: {
+      primary: {
+        main: primaryColor,
+      },
+    },
+  })
+
   if (!isAppLoading) {
     return (
-      <>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+
         <AppBar elevation={0} color="inherit">
           <Toolbar>
             <DrawerMenu />
@@ -54,7 +66,7 @@ const Layout: React.FC = ({ children }) => {
           vertical="top"
         />
         <main>{children}</main>
-      </>
+      </ThemeProvider>
     )
   } else {
     return <AppLoading />

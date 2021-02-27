@@ -17,10 +17,10 @@ import NumberSquare from '../../components/NumberSquare'
 import PlayerDrawer from '../../components/PlayerDrawer'
 import HistoryDrawer from '../../components/HistoryDrawer'
 import GiftDrawer from '../../components/GiftDrawer'
-
-import useAPI from '../../hooks/useAPI'
 import SpinnerIcon from '../../components/SpinnerIcon'
 import EntryButton from '../../components/EntryButton'
+import SettingDialog from '../../components/SettingDialog'
+import useAPI from '../../hooks/useAPI'
 
 export default function Card() {
   const maxNumber = 75
@@ -220,6 +220,8 @@ const View: React.FC<{
         )}
       </div>
 
+      <SettingDialog className={classes.setting} />
+
       <FAB />
       <PlayerDrawer players={room.players ?? []} />
       <GiftDrawer gifts={room.gifts ?? []} />
@@ -233,7 +235,7 @@ function LoadingView() {
   return <CircularProgress className={classes.loading} />
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     height: '100%',
     paddingTop: '64px',
@@ -250,4 +252,9 @@ const useStyles = makeStyles(() => ({
 
   roomId: { color: 'gray', fontSize: '9px', textAlign: 'right' },
   loading: { position: 'absolute', top: '50%', left: '50%' },
+  setting: {
+    position: 'absolute',
+    bottom: theme.spacing(3),
+    left: theme.spacing(3),
+  },
 }))

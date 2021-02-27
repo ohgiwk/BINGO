@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   },
   opened: {
     color: '#fff',
-    background: '#ff89a3!important',
+    background: theme.palette.primary.main + '!important',
     // background: 'linear-gradient(45deg, #ff89a3 30%, #ff8e53 100%)',
   },
   reach: {

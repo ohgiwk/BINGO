@@ -18,10 +18,14 @@ type ConfirmDialogState = {
 }
 
 interface State {
+  primaryColor: string
+  setPrimaryColor: React.Dispatch<React.SetStateAction<string>>
+
   isAppLoading: boolean
   setIsAppLoading: React.Dispatch<React.SetStateAction<boolean>>
   isLoading: boolean
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+
   isAuth: boolean
   setIsAuth: React.Dispatch<React.SetStateAction<boolean>>
   currentUser: firebase.User | undefined
@@ -38,6 +42,7 @@ interface State {
 const AppContext = createContext<State>({} as State)
 
 function AppContextProvider(props: { children?: React.ReactNode }) {
+  const [primaryColor, setPrimaryColor] = useState('#ff89a3')
   const [isAppLoading, setIsAppLoading] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [isAuth, setIsAuth] = useState(false)
@@ -64,6 +69,8 @@ function AppContextProvider(props: { children?: React.ReactNode }) {
   return (
     <AppContext.Provider
       value={{
+        primaryColor,
+        setPrimaryColor,
         isAppLoading,
         setIsAppLoading,
         isLoading,
