@@ -8,6 +8,7 @@ import { Room } from '../../common/types'
 import useAPI from '../../hooks/useAPI'
 import { AppContext } from '../../contexts/AppContext'
 import { BingoContext } from '../../contexts/BingoContext'
+import { wait } from '../../common/utils'
 
 const EntryDialog: React.FC<{
   room: Room
@@ -16,7 +17,7 @@ const EntryDialog: React.FC<{
 }> = ({ room, open, setOpen }) => {
   const classes = useStyles()
   const { updateRoom } = useAPI()
-  const { openDialog, closeDialog } = useContext(AppContext)
+  const { openDialog, closeDialog, setIsLoading } = useContext(AppContext)
   const { setPlayerId } = useContext(BingoContext)
 
   const [name, setName] = useState('')
@@ -28,6 +29,8 @@ const EntryDialog: React.FC<{
       primaryButtonText: 'OK',
       secondaryButtonText: 'キャンセル',
       onClickPrimaryButton: async () => {
+        setIsLoading(true)
+
         // プレイヤーを追加
         const id = uuidv4()
         await updateRoom(room.id, {
@@ -37,6 +40,9 @@ const EntryDialog: React.FC<{
 
         setPlayerId(id)
         closeDialog()
+
+        await wait(500)
+        setIsLoading(false)
 
         openDialog({
           text: 'エントリーしました！',

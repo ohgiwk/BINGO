@@ -1,6 +1,7 @@
 import React from 'react'
 // prettier-ignore
 import { Button, Dialog, DialogContent, DialogTitle, DialogActions, DialogContentText } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
 
 interface Props {
   open: boolean
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export default function ConfirmDialog(props: Props) {
+  const classes = useStyles()
+
   return (
     <Dialog open={props.open}>
       <DialogTitle>{props.title}</DialogTitle>
@@ -29,7 +32,9 @@ export default function ConfirmDialog(props: Props) {
           <Button
             onClick={props.onClickPrimaryButton}
             color="primary"
+            variant="contained"
             autoFocus
+            className={classes.primary}
           >
             {props.primaryButtonText}
           </Button>
@@ -38,3 +43,10 @@ export default function ConfirmDialog(props: Props) {
     </Dialog>
   )
 }
+
+const useStyles = makeStyles(() => ({
+  primary: {
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+}))

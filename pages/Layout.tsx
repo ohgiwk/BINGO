@@ -1,5 +1,11 @@
 import { useContext } from 'react'
-import { AppBar, Toolbar, Typography } from '@material-ui/core'
+import {
+  AppBar,
+  Backdrop,
+  CircularProgress,
+  Toolbar,
+  Typography,
+} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 import AppLoading from '../components/AppLoading'
@@ -9,22 +15,16 @@ import { AppContext } from '../contexts/AppContext'
 import useAuth from '../hooks/useAuth'
 import ConfirmDialog from '../components/ConfirmDialog'
 
-const useStyles = makeStyles(() => ({
-  title: {
-    flexGrow: 1,
-    fontFamily: "'Lora', serif",
-    color: 'gray',
-    marginLeft: '-60px',
-    textAlign: 'center',
-  },
-}))
-
 const Layout: React.FC = ({ children }) => {
   const classes = useStyles()
 
-  const { isAppLoading, snackBar, setSnackBar, confirmDialog } = useContext(
-    AppContext
-  )
+  const {
+    isAppLoading,
+    isLoading,
+    snackBar,
+    setSnackBar,
+    confirmDialog,
+  } = useContext(AppContext)
   const { initAuth } = useAuth()
   initAuth()
 
@@ -42,6 +42,10 @@ const Layout: React.FC = ({ children }) => {
 
         <ConfirmDialog {...confirmDialog} />
 
+        <Backdrop className={classes.backdrop} open={isLoading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+
         <SnackBar
           open={snackBar.open}
           message={snackBar.message}
@@ -56,5 +60,16 @@ const Layout: React.FC = ({ children }) => {
     return <AppLoading />
   }
 }
+
+const useStyles = makeStyles((theme) => ({
+  title: {
+    flexGrow: 1,
+    fontFamily: "'Lora', serif",
+    color: 'gray',
+    marginLeft: '-60px',
+    textAlign: 'center',
+  },
+  backdrop: { zIndex: theme.zIndex.modal + 1, flexDirection: 'column' },
+}))
 
 export default Layout

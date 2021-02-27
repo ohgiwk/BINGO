@@ -17,8 +17,10 @@ import NumberSquare from '../../components/NumberSquare'
 import PlayerDrawer from '../../components/PlayerDrawer'
 import HistoryDrawer from '../../components/HistoryDrawer'
 import GiftDrawer from '../../components/GiftDrawer'
-import EntryDialog from '../../components/EntryDialog'
+
 import useAPI from '../../hooks/useAPI'
+import SpinnerIcon from '../../components/SpinnerIcon'
+import EntryButton from '../../components/EntryButton'
 
 export default function Card() {
   const maxNumber = 75
@@ -27,10 +29,10 @@ export default function Card() {
   const router = useRouter()
   const { id: roomId } = router.query
 
-  const { setSnackBar } = useContext(AppContext)
+  const { setSnackBar, openDialog, closeDialog } = useContext(AppContext)
   const { playerId } = useContext(BingoContext)
   const { updateRoom } = useAPI()
-  const [entryDialogOpen, setEntryDialogOpen] = useState(false)
+
   const [numbers, setNumbers] = useState<Number[]>([])
   const [room, setRoom] = useState<Room>()
 
@@ -59,7 +61,7 @@ export default function Card() {
       }
 
       // 確定済みの数字列を取得 もしくは 新規生成
-      const me = room.players?.find((p) => p.name === playerId)
+      const me = room.players?.find((p) => p.id === playerId)
       const myNumbers = toCardNumbers(
         me && me.numbers
           ? me.numbers
@@ -94,27 +96,33 @@ export default function Card() {
     setNumbers(result)
   }
 
-  function onClickEntry() {
-    setEntryDialogOpen(true)
-  }
-
   /**
    * 数字の確定
    */
   function onClickSelect() {
     if (room) {
-      const players =
-        room.players?.map((p) =>
-          p.id === playerId
-            ? {
-                ...p,
-                numbers: numbers.map((n) => n.number),
-                bingo: 0,
-                reach: 0,
-              }
-            : p
-        ) ?? []
-      updateRoom(room.id, { ...room, players })
+      openDialog({
+        text: 'ビンゴカードを確定してもよろしいですか？',
+        primaryButtonText: 'OK',
+        secondaryButtonText: 'キャンセル',
+        onClickPrimaryButton: async () => {
+          const players =
+            room.players?.map((p) =>
+              p.id === playerId
+                ? {
+                    ...p,
+                    numbers: numbers.map((n) => n.number),
+                    bingo: 0,
+                    reach: 0,
+                  }
+                : p
+            ) ?? []
+          await updateRoom(room.id, { ...room, players })
+
+          closeDialog()
+        },
+        onClickSecondaryButton: () => closeDialog(),
+      })
     }
   }
 
@@ -128,9 +136,6 @@ export default function Card() {
           room,
           numbers,
           playerId,
-          entryDialogOpen,
-          setEntryDialogOpen,
-          onClickEntry,
           onClickSelect,
           onClickRegenerate,
           onClickNumber,
@@ -146,24 +151,18 @@ const View: React.FC<{
   room: Room
   numbers: Number[]
   playerId: string
-  entryDialogOpen: boolean
-  setEntryDialogOpen: Dispatch<SetStateAction<boolean>>
-  onClickEntry: () => void
   onClickSelect: () => void
   onClickRegenerate: () => void
   onClickNumber: (num: Number) => void
 }> = (props) => {
   const classes = useStyles()
   const { room } = props
+  const me = room.players?.find((r) => r.id === props.playerId)
 
   return (
     <Container className={classes.container} maxWidth="xs">
       <Typography className={classes.roomId}>
-        {props.playerId
-          ? `エントリー中: ${
-              room.players?.find((r) => r.id === props.playerId)?.name
-            }`
-          : '未エントリー'}
+        {props.playerId ? `エントリー中: ${me?.name}` : '未エントリー'}
       </Typography>
 
       <div>
@@ -187,7 +186,9 @@ const View: React.FC<{
       </div>
 
       <div className={classes.buttons}>
-        {props.playerId ? (
+        {!props.playerId && <EntryButton {...{ room }} />}
+
+        {props.playerId && !me?.numbers && (
           <>
             <div>タップして番号を変更できます</div>
             <Button
@@ -198,6 +199,7 @@ const View: React.FC<{
             >
               決定！
             </Button>
+
             <Button
               variant="contained"
               className={classes.button}
@@ -206,26 +208,17 @@ const View: React.FC<{
               選び直す
             </Button>
           </>
-        ) : (
-          <Button
-            style={{ width: '300px' }}
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={props.onClickEntry}
-          >
-            エントリーする！
-          </Button>
+        )}
+
+        {props.playerId && me?.numbers && (
+          <>
+            <SpinnerIcon />
+            <div style={{ marginTop: '1rem' }}>
+              ビンゴ開始まで少々お待ちください
+            </div>
+          </>
         )}
       </div>
-
-      <EntryDialog
-        {...{
-          room,
-          open: props.entryDialogOpen,
-          setOpen: props.setEntryDialogOpen,
-        }}
-      />
 
       <FAB />
       <PlayerDrawer players={room.players ?? []} />
