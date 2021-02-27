@@ -262,7 +262,7 @@ const MainView: React.FC<{
           <Button onClick={onClickReset}>リセット</Button>
         </ButtonGroup>
       </div> */}
-      <div className={classes.info}>
+      <div className={`${classes.info} ${classes.blinking}`}>
         現在の参加人数: {room.players?.length ?? 0}人
       </div>
       {/* <div className={classes.info}>現在のビンゴ数: 1</div>
@@ -353,4 +353,10 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: '1rem',
   },
   loading: { position: 'absolute', top: '50%', left: '50%' },
+  blinking: { animation: '$blinking 2s ease infinite' },
+  '@keyframes blinking': {
+    '0%': { opacity: '0' },
+    '50%': { opacity: '1' },
+    '100%': { opacity: '0' },
+  },
 }))
