@@ -1,5 +1,5 @@
 // prettier-ignore
-import { useState, useEffect, useContext, Dispatch, SetStateAction } from 'react'
+import { useState, useEffect, useContext } from 'react'
 // prettier-ignore
 import { Container, Button, Typography, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -178,6 +178,7 @@ const View: React.FC<{
               <NumberSquare
                 key={j}
                 number={num}
+                history={room.history ?? []}
                 onClick={(num) => props.onClickNumber(num)}
               />
             ))}
