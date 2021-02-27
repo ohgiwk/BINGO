@@ -8,8 +8,14 @@ import { Number } from './types'
  * @param maxNumber
  * @param numOfNumbersOnCard
  */
-function generateNumbers(maxNumber: number, numOnCard: number) {
-  return take(shuffle(range(maxNumber, 1)), numOnCard)
+function generateNumbers() {
+  return transpose([
+    take(shuffle(range(15, 1)), 5),
+    take(shuffle(range(15, 16)), 5),
+    take(shuffle(range(15, 31)), 5),
+    take(shuffle(range(15, 46)), 5),
+    take(shuffle(range(15, 61)), 5),
+  ]).flat()
 }
 
 /**
