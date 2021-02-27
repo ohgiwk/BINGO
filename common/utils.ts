@@ -16,6 +16,10 @@ export function chunk<T>(array: T[], size: number): T[][] {
   return chunked
 }
 
+/**
+ * 渡された配列の要素をランダム並び替えた配列を返す
+ * @param param0
+ */
 export function shuffle<T>([...array]: T[]): T[] {
   for (let i = array.length - 1; i >= 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
@@ -50,6 +54,10 @@ export function take<T>(array: T[], n: number): T[] {
   return takeValues
 }
 
+/**
+ *
+ * @param array
+ */
 export function transpose<T>(array: T[][]): T[][] {
   return array[0].map((col, i) => array.map((row) => row[i]))
 }
@@ -64,6 +72,22 @@ export function deepCopy<T>(obj: T): T[] {
  */
 export function reverse<T>(array: T[]): T[] {
   return [...array].reverse()
+}
+
+/**
+ * 配列内の重複した要素を削除した配列を返す
+ * @param array
+ */
+export function unique<T>(array: T[]): T[] {
+  return Array.from(new Set(array))
+}
+
+export function max(array: number[]) {
+  return array.reduce((a, b) => Math.max(a, b))
+}
+
+export function min(array: number[]) {
+  return array.reduce((a, b) => Math.min(a, b))
 }
 
 /**

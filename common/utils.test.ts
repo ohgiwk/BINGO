@@ -6,6 +6,7 @@ import {
   transpose,
   deepCopy,
   reverse,
+  unique,
 } from './utils'
 
 describe('Test utils.ts', () => {
@@ -56,8 +57,6 @@ describe('Test utils.ts', () => {
     const result = shuffle(arr)
     // 別のオブジェクトかどうか
     expect(result).not.toBe(arr)
-    // シャッフルされているかどうか
-    expect(result).not.toEqual(arr)
   })
 
   test('Test range function', () => {
@@ -122,5 +121,14 @@ describe('Test utils.ts', () => {
     expect(arr).toEqual([0, 1, 2, 3, 4, 5])
     // 元の配列と違うオブジェクトか
     expect(result).not.toBe(arr)
+  })
+
+  test('Test unique function', () => {
+    // 正常系
+    expect(unique([1, 1, 1, 2])).toEqual([1, 2])
+    // 正常系
+    expect(unique(['1', '2', '2', '3', '3'])).toEqual(['1', '2', '3'])
+    // 空配列を渡す
+    expect(unique([])).toEqual([])
   })
 })
