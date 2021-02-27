@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useContext, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import * as MUI from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Room } from '../../common/types'
 import useAPI from '../../hooks/useAPI'
@@ -16,7 +17,7 @@ const EntryDialog: React.FC<{
   const classes = useStyles()
   const { updateRoom } = useAPI()
   const { openDialog, closeDialog } = useContext(AppContext)
-  const { setPlayerName } = useContext(BingoContext)
+  const { setPlayerId } = useContext(BingoContext)
 
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
@@ -27,12 +28,14 @@ const EntryDialog: React.FC<{
       primaryButtonText: 'OK',
       secondaryButtonText: 'キャンセル',
       onClickPrimaryButton: async () => {
+        // プレイヤーを追加
+        const id = uuidv4()
         await updateRoom(room.id, {
           ...room,
-          players: [...(room.players ?? []), { name, message }],
+          players: [...(room.players ?? []), { id, name, message }],
         })
 
-        setPlayerName(name)
+        setPlayerId(id)
         closeDialog()
 
         openDialog({

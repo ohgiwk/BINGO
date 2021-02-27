@@ -8,8 +8,8 @@ interface State {
   setOpenGiftDrawer: React.Dispatch<React.SetStateAction<boolean>>
   openPlayerDrawer: boolean
   setOpenPlayerDrawer: React.Dispatch<React.SetStateAction<boolean>>
-  playerName: string
-  setPlayerName: React.Dispatch<React.SetStateAction<string>>
+  playerId: string
+  setPlayerId: (arg: string) => void
 }
 
 const BingoContext = createContext<State>({} as State)
@@ -18,7 +18,8 @@ function BingoContextProvider(props: { children?: React.ReactNode }) {
   const [openHistoryDrawer, setOpenHistoryDrawer] = useState(false)
   const [openGiftDrawer, setOpenGiftDrawer] = useState(false)
   const [openPlayerDrawer, setOpenPlayerDrawer] = useState(false)
-  const [playerName, setPlayerName] = useLocalStorage('player', '')
+
+  const [playerId, setPlayerId] = useLocalStorage('playerId', '')
 
   return (
     <BingoContext.Provider
@@ -29,8 +30,8 @@ function BingoContextProvider(props: { children?: React.ReactNode }) {
         setOpenGiftDrawer,
         openPlayerDrawer,
         setOpenPlayerDrawer,
-        playerName,
-        setPlayerName,
+        playerId,
+        setPlayerId,
       }}
     >
       {props.children}

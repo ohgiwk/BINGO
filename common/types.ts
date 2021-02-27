@@ -7,6 +7,7 @@ export type Number = {
 }
 
 export type Player = {
+  id: string
   name: string
   message: string
   numbers?: string[]

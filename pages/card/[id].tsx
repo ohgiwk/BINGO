@@ -1,7 +1,7 @@
 // prettier-ignore
 import { useState, useEffect, useContext, Dispatch, SetStateAction } from 'react'
 // prettier-ignore
-import { Container, Button, Typography, CircularProgress, TextField, Paper, Divider } from '@material-ui/core'
+import { Container, Button, Typography, CircularProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useRouter } from 'next/router'
 import firebase from 'firebase'
@@ -28,15 +28,13 @@ export default function Card() {
   const { id: roomId } = router.query
 
   const { setSnackBar } = useContext(AppContext)
-  const { playerName } = useContext(BingoContext)
+  const { playerId } = useContext(BingoContext)
   const { updateRoom } = useAPI()
   const [entryDialogOpen, setEntryDialogOpen] = useState(false)
   const [numbers, setNumbers] = useState<Number[]>([])
   const [room, setRoom] = useState<Room>()
 
   useEffect(() => {
-    setNumbers(toCardNumbers(generateNumbers(maxNumber, numOfNumbersOnCard)))
-
     const roomRef = firebase.database().ref('rooms/' + roomId)
     roomRef.on('value', (snapshot) => {
       setRoom(snapshot.val())
@@ -44,13 +42,15 @@ export default function Card() {
   }, [])
 
   useEffect(() => {
+    // 初回読み込み
+
     if (room) {
       if (room.number === '0') return
       // 抽選画面から配信された数字
       const target = numbers.find((n) => n.number === room.number)
 
       // SnackBarを表示
-      if (room.status === 'started' && playerName) {
+      if (room.status === 'started' && playerId) {
         setSnackBar({
           open: true,
           message: `「${room.number}」が出ました！`,
@@ -58,18 +58,21 @@ export default function Card() {
         })
       }
 
-      // 確定済みの数字列を取得
-      const me = room.players?.find((p) => p.name === playerName)
-      if (me && me.numbers) {
-        toCardNumbers(me.numbers)
-      }
+      // 確定済みの数字列を取得 もしくは 新規生成
+      const me = room.players?.find((p) => p.name === playerId)
+      const myNumbers = toCardNumbers(
+        me && me.numbers
+          ? me.numbers
+          : generateNumbers(maxNumber, numOfNumbersOnCard)
+      )
 
-      // 履歴にある数字をオープンにする
-      let result = numbers.map((n) => ({
+      // ルーム履歴にある数字をオープンにする
+      let result = myNumbers.map((n) => ({
         ...n,
         open: (n.open || room.history?.includes(n.number)) ?? false,
       }))
 
+      // 新たに抽選された数字をオープンにする
       if (target) {
         result = [
           ...result.map((n) => ({
@@ -79,7 +82,7 @@ export default function Card() {
         ]
       }
 
-      // setNumbers(checkBingo(result))
+      setNumbers(checkBingo(result))
     }
   }, [room])
 
@@ -102,7 +105,7 @@ export default function Card() {
     if (room) {
       const players =
         room.players?.map((p) =>
-          p.name === playerName
+          p.id === playerId
             ? {
                 ...p,
                 numbers: numbers.map((n) => n.number),
@@ -116,7 +119,7 @@ export default function Card() {
   }
 
   const onClickRegenerate = () =>
-    setNumbers(generateNumbers(maxNumber, numOfNumbersOnCard))
+    setNumbers(toCardNumbers(generateNumbers(maxNumber, numOfNumbersOnCard)))
 
   if (room) {
     return (
@@ -124,7 +127,7 @@ export default function Card() {
         {...{
           room,
           numbers,
-          playerName,
+          playerId,
           entryDialogOpen,
           setEntryDialogOpen,
           onClickEntry,
@@ -142,7 +145,7 @@ export default function Card() {
 const View: React.FC<{
   room: Room
   numbers: Number[]
-  playerName: string
+  playerId: string
   entryDialogOpen: boolean
   setEntryDialogOpen: Dispatch<SetStateAction<boolean>>
   onClickEntry: () => void
@@ -155,11 +158,13 @@ const View: React.FC<{
 
   return (
     <Container className={classes.container} maxWidth="xs">
-      {props.playerName && (
-        <Typography className={classes.roomId}>
-          エントリー中: {props.playerName}
-        </Typography>
-      )}
+      <Typography className={classes.roomId}>
+        {props.playerId
+          ? `エントリー中: ${
+              room.players?.find((r) => r.id === props.playerId)?.name
+            }`
+          : '未エントリー'}
+      </Typography>
 
       <div>
         <h2 className={classes.title}> {room.name}</h2>
@@ -182,7 +187,7 @@ const View: React.FC<{
       </div>
 
       <div className={classes.buttons}>
-        {props.playerName ? (
+        {props.playerId ? (
           <>
             <div>タップして番号を変更できます</div>
             <Button

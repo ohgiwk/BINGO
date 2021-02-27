@@ -16,7 +16,7 @@ function generateNumbers(maxNumber: number, numOnCard: number) {
  *
  * @param numbers
  */
-function toCardNumbers(numbers: number[]) {
+function toCardNumbers(numbers: (number | string)[]) {
   const list = numbers.map((n) => ({
     open: false,
     number: String(n),
