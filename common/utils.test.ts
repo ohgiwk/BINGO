@@ -7,6 +7,7 @@ import {
   deepCopy,
   reverse,
   unique,
+  substract,
 } from './utils'
 
 describe('Test utils.ts', () => {
@@ -130,5 +131,16 @@ describe('Test utils.ts', () => {
     expect(unique(['1', '2', '2', '3', '3'])).toEqual(['1', '2', '3'])
     // 空配列を渡す
     expect(unique([])).toEqual([])
+  })
+
+  test('Test substract function', () => {
+    // 正常系
+    expect(substract([1, 2, 3], [1, 2])).toEqual([3])
+
+    expect(substract([1, 2], [1, 2, 3])).toEqual([3])
+
+    expect(substract([], [1, 2, 3])).toEqual([1, 2, 3])
+
+    expect(substract([1, 2, 3], [])).toEqual([1, 2, 3])
   })
 })

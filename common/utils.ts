@@ -91,6 +91,16 @@ export function min(array: number[]) {
 }
 
 /**
+ * 2つの配列のなかで片方にしかない要素の配列を返す
+ * @param a
+ * @param b
+ */
+export function substract<T>(a: T[], b: T[]): T[] {
+  const [_a, _b] = a.length > b.length ? [a, b] : [b, a]
+  return _a.filter((i) => !_b.includes(i))
+}
+
+/**
  * 指定ミリ秒待つプロミスを返す
  * @param ms
  */

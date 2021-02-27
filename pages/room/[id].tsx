@@ -6,7 +6,7 @@ import firebase from 'firebase'
 import { useRouter } from 'next/router'
 import moment from 'moment'
 
-import { range, chunk, shuffle, wait } from '../../common/utils'
+import { range, chunk, shuffle, wait, substract } from '../../common/utils'
 import { Room } from '../../common/types'
 import useAPI from '../../hooks/useAPI'
 import FAB from '../../components/FAB'
@@ -28,7 +28,7 @@ export default function LotteryRoom() {
 
   const maxNumber = 75
 
-  const { openDialog, closeDialog } = useContext(AppContext)
+  const { openDialog, closeDialog, setSnackBar } = useContext(AppContext)
   const [room, setRoom] = useState<Room>()
   const [number, setNumber] = useState<string>('0')
   const [numbers, setNumbers] = useState<Number[]>(
@@ -47,16 +47,39 @@ export default function LotteryRoom() {
 
     const roomRef = firebase.database().ref('rooms/' + roomId)
     roomRef.on('value', (snapshot) => {
-      const room = snapshot.val() as Room
+      const newRoom = snapshot.val() as Room
 
-      if (room) {
+      if (newRoom) {
+        // 抽選履歴を取得して反映
         setNumbers(
           numbers.map((n) => ({
             ...n,
-            open: room.history?.includes(n.value) ?? false,
+            open: newRoom.history?.includes(n.value) ?? false,
           }))
         )
-        setRoom(room)
+
+        // 新しいユーザーが参加したら通知を表示
+        if (room) {
+          const newPlayerIds = substract(
+            room.players?.map((p) => p.id) ?? [],
+            newRoom.players?.map((p) => p.id) ?? []
+          )
+          if (newPlayerIds.length > 0) {
+            const playerNames =
+              newRoom.players
+                ?.filter((p) => newPlayerIds.includes(p.id))
+                .map((p) => `${p.name} さん`)
+                .join('と') ?? ''
+
+            setSnackBar({
+              open: true,
+              message: `${playerNames}が参加しました！`,
+              type: 'info',
+            })
+          }
+        }
+
+        setRoom(newRoom)
       } else {
         setIsValidRoomId(false)
       }
