@@ -9,7 +9,7 @@ import moment from 'moment'
 
 import { chunk } from '../../common/utils'
 import { Number, Room } from '../../common/types'
-import useBingo from '../../hooks/useBingo'
+import { generateNumbers, toCardNumbers, checkBingo } from '../../common/bingo'
 import { AppContext } from '../../contexts/AppContext'
 import { BingoContext } from '../../contexts/BingoContext'
 import FAB from '../../components/FAB'
@@ -33,10 +33,9 @@ export default function Card() {
   const [entryDialogOpen, setEntryDialogOpen] = useState(false)
   const [numbers, setNumbers] = useState<Number[]>([])
   const [room, setRoom] = useState<Room>()
-  const { generateNumbers, toCardNumbers, checkBingo } = useBingo()
 
   useEffect(() => {
-    setNumbers(generateNumbers(maxNumber, numOfNumbersOnCard))
+    setNumbers(toCardNumbers(generateNumbers(maxNumber, numOfNumbersOnCard)))
 
     const roomRef = firebase.database().ref('rooms/' + roomId)
     roomRef.on('value', (snapshot) => {
@@ -155,7 +154,7 @@ const View: React.FC<{
   const { room } = props
 
   return (
-    <Container className={classes.container} maxWidth="md">
+    <Container className={classes.container} maxWidth="xs">
       {props.playerName && (
         <Typography className={classes.roomId}>
           エントリー中: {props.playerName}
