@@ -64,7 +64,10 @@ const EntryDialog: React.FC<{
       <MUI.DialogTitle>
         <div className={classes.title}>
           ビンゴへ参加！
-          <MUI.IconButton onClick={() => setOpen(false)}>
+          <MUI.IconButton
+            className={classes.close}
+            onClick={() => setOpen(false)}
+          >
             <CloseIcon />
           </MUI.IconButton>
         </div>
@@ -121,6 +124,7 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'space-between',
     lineHeight: '48px',
   },
+  close: { position: 'relative', top: '-8px', left: '15px' },
   buttons: { textAlign: 'center' },
   divider: { margin: '1rem 0' },
   row: { textAlign: 'center', margin: '0.5rem 0' },
