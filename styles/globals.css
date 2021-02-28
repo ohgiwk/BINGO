@@ -27,15 +27,6 @@ a {
   box-sizing: border-box;
 }
 
-@keyframes reach {
-  0% {
-    border-color: #fff;
-  }
-  100% {
-    border-color: #ff89a3;
-  }
-}
-
 @keyframes roulette {
   0% {
     opacity: 1;

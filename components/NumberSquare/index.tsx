@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
   },
   reach: {
     border: `solid 3px ${theme.palette.primary.main}`,
-    animation: 'reach 1s linear alternate infinite',
+    animation: '$reach 1s linear alternate infinite',
   },
   bingo: {
     color: '#fff',
@@ -80,4 +80,9 @@ const useStyles = makeStyles((theme) => ({
   },
   center: { borderRadius: '10%' },
   incorrect: { background: '#888!important' },
+
+  '@keyframes reach': {
+    '0%': { borderColor: '#fff' },
+    '100%': { borderColor: theme.palette.primary.main },
+  },
 }))
