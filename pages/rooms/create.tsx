@@ -40,6 +40,7 @@ export default function createRoom() {
             number: '0',
             gifts: [],
             history: [],
+            startDate: new Date().getTime(),
           })
           closeDialog()
           setIsProgress(false)
