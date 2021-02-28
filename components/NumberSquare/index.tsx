@@ -44,9 +44,9 @@ export default NumberSquare
 
 const useStyles = makeStyles((theme) => ({
   number: {
-    width: '56px',
-    minWidth: '56px',
-    height: '56px',
+    width: '64px',
+    minWidth: '64px',
+    height: '64px',
     margin: '0.2rem',
     textAlign: 'center',
     fontSize: '1.8rem',
