@@ -1,7 +1,7 @@
 // prettier-ignore
 import { useState, useEffect, useContext } from 'react'
 // prettier-ignore
-import { Container, Button, Typography, CircularProgress } from '@material-ui/core'
+import { Container, Button, Typography, Backdrop } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useRouter } from 'next/router'
 import firebase from 'firebase'
@@ -22,12 +22,16 @@ import SpinnerIcon from '../../components/SpinnerIcon'
 import EntryButton from '../../components/EntryButton'
 import SettingDialog from '../../components/SettingDialog'
 import useAPI from '../../hooks/useAPI'
+import { THEME_COLORS } from '../../common/constants'
+import AppLoading from '../../components/AppLoading'
 
 export default function Card() {
   const router = useRouter()
   const { id: roomId } = router.query
 
-  const { setSnackBar, openDialog, closeDialog } = useContext(AppContext)
+  const { setSnackBar, openDialog, closeDialog, setPrimaryColor } = useContext(
+    AppContext
+  )
   const { playerId } = useContext(BingoContext)
   const { updateRoom } = useAPI()
 
@@ -43,11 +47,17 @@ export default function Card() {
 
   useEffect(() => {
     if (room) {
+      let myNumbers = []
       // 確定済みの数字列を取得 もしくは 新規生成
       const me = room.players?.find((p) => p.id === playerId)
-      let myNumbers = toCardNumbers(
-        me && me.numbers ? me.numbers : generateNumbers()
-      )
+      if (me && me.numbers) {
+        myNumbers = toCardNumbers(me.numbers)
+      } else {
+        setPrimaryColor(
+          THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]
+        )
+        myNumbers = toCardNumbers(generateNumbers())
+      }
 
       // 完全にエントリーしてなければ表示しない
       if (me && me.numbers) {
@@ -206,6 +216,10 @@ const View: React.FC<{
             </div>
           )}
         </div>
+
+        {/* <div className={classes.reach}>リーチ！！</div> */}
+        {/* <div className={`${classes.bingo} ${classes.appear}`}>BINGO!!</div> */}
+
         <SettingDialog className={classes.setting} />
         <FAB />
         <PlayerDrawer players={room.players ?? []} isEntered={!!me} />
@@ -218,7 +232,7 @@ const View: React.FC<{
 
 function LoadingView() {
   const classes = useStyles()
-  return <CircularProgress className={classes.loading} />
+  return <AppLoading />
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -238,10 +252,39 @@ const useStyles = makeStyles((theme) => ({
   buttons: { textAlign: 'center' },
 
   roomId: { color: 'gray', fontSize: '9px', textAlign: 'right' },
-  loading: { position: 'absolute', top: '50%', left: '50%' },
   setting: {
     position: 'absolute',
     bottom: theme.spacing(3),
     left: theme.spacing(3),
+  },
+  reach: {
+    color: theme.palette.primary.main,
+    fontSize: '3rem',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: '-120px',
+    transform: 'rotate(-5deg) translateY(-200px)',
+    textShadow: '2px 2px 5px rgba(0, 0, 0, 0.3)',
+  },
+  bingo: {
+    color: theme.palette.primary.main,
+    fontSize: '3.5rem',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: '-85px',
+    transform: 'rotate(-5deg) translateY(-200px)',
+    textShadow: '2px 2px 5px rgba(0, 0, 0, 0.3)',
+    transition: '0.3s',
+    opacity: 0,
+  },
+  appear: {
+    transform: 'rotate(-5deg) translateY(-250px)',
+    opacity: 1,
   },
 }))

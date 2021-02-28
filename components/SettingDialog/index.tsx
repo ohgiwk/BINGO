@@ -3,6 +3,7 @@ import * as MUI from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import SettingsIcon from '@material-ui/icons/Settings'
 import { AppContext } from '../../contexts/AppContext'
+import { THEME_COLORS } from '../../common/constants'
 
 const SettingDialog = (props: { className?: string }) => {
   const classes = useStyles()
@@ -20,17 +21,6 @@ const SettingDialog = (props: { className?: string }) => {
     setTab(newValue)
   }
 
-  const colors = [
-    '#ff89a3',
-    '#2196f3',
-    '#e91e63',
-    '#009688',
-    '#ffc107',
-    '#673ab7',
-    '#ff5722',
-    '#cddc39',
-    // '#3f51b5',
-  ]
   function onClickColor(color: string) {
     setSelectedColor(color)
     setPrimaryColor(color)
@@ -56,7 +46,7 @@ const SettingDialog = (props: { className?: string }) => {
 
           <div className={classes.label}>テーマカラー</div>
           <div className={classes.colors}>
-            {colors.map((c, i) => (
+            {THEME_COLORS.map((c, i) => (
               <div
                 key={i}
                 className={classes.color}
