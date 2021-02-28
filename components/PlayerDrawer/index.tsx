@@ -9,7 +9,8 @@ import { Player } from '../../common/types'
 
 const PlayerDrawer: React.FC<{
   players: Player[]
-}> = ({ players }) => {
+  isEntered: boolean
+}> = ({ players, isEntered }) => {
   const classes = useStyles()
 
   const { openPlayerDrawer: open, setOpenPlayerDrawer: setOpen } = useContext(
@@ -29,19 +30,27 @@ const PlayerDrawer: React.FC<{
         <div>
           <ListSubheader className={classes.header}>参加者一覧</ListSubheader>
           <List>
-            {players.map((p, i) => (
-              <ListItem key={i} className={classes.item}>
-                <ListItemAvatar>
-                  <Avatar>
-                    <PersonIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={p.name}
-                  secondary={p.message}
-                ></ListItemText>
+            {isEntered &&
+              players.map((p, i) => (
+                <ListItem key={i} className={classes.item}>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <PersonIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={p.name}
+                    secondary={p.message}
+                  ></ListItemText>
+                </ListItem>
+              ))}
+            {!isEntered && (
+              <ListItem>
+                <ListItemText className={classes.pleaseEntry}>
+                  エントリーしてください
+                </ListItemText>
               </ListItem>
-            ))}
+            )}
           </List>
         </div>
       </div>
@@ -52,9 +61,13 @@ const PlayerDrawer: React.FC<{
 export default PlayerDrawer
 
 const useStyles = makeStyles(() => ({
-  list: { width: 200 },
+  list: { width: 240 },
   header: { background: '#fff' },
   item: { padding: '0.1rem 16px' },
+  pleaseEntry: {
+    color: 'gray',
+    textAlign: 'center',
+  },
   no: {
     color: 'gray',
     width: '30px',

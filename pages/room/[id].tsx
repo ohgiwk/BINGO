@@ -269,9 +269,9 @@ const MainView: React.FC<{
       <div className={classes.info}>現在のリーチ数: 1</div> */}
 
       <FAB className={classes.fab} />
-      <PlayerDrawer players={room.players ?? []} />
-      <GiftDrawer gifts={room.gifts ?? []} />
-      <HistoryDrawer history={room.history ?? []} />
+      <PlayerDrawer players={room.players ?? []} isEntered={true} />
+      <GiftDrawer gifts={room.gifts ?? []} isEntered={true} />
+      <HistoryDrawer history={room.history ?? []} isEntered={true} />
 
       <MUI.Dialog open={props.open}>
         <MUI.DialogContent

@@ -4,11 +4,10 @@ import { Drawer, List, ListItem, ListItemText, ListSubheader } from '@material-u
 import { BingoContext } from '../../contexts/BingoContext'
 import { makeStyles } from '@material-ui/core/styles'
 
-interface Props {
+const GiftDrawer: React.FC<{
   gifts: string[]
-}
-
-export default function GiftDrawer({ gifts }: Props) {
+  isEntered: boolean
+}> = ({ gifts, isEntered }) => {
   const classes = useStyles()
 
   const { openGiftDrawer: open, setOpenGiftDrawer: setOpen } = useContext(
@@ -30,24 +29,39 @@ export default function GiftDrawer({ gifts }: Props) {
         <div>
           <ListSubheader className={classes.header}>景品一覧</ListSubheader>
           <List>
-            {gifts.map((h, i) => (
-              <ListItem button key={i} className={classes.item}>
-                <ListItemText>
-                  <span className={classes.no}>{i + 1}. </span>
-                  <span className={classes.number}>{h}</span>
+            {isEntered &&
+              gifts.map((h, i) => (
+                <ListItem button key={i} className={classes.item}>
+                  <ListItemText>
+                    <span className={classes.no}>{i + 1}. </span>
+                    <span className={classes.number}>{h}</span>
+                  </ListItemText>
+                </ListItem>
+              ))}
+            {!isEntered && (
+              <ListItem>
+                <ListItemText className={classes.pleaseEntry}>
+                  エントリーしてください
                 </ListItemText>
               </ListItem>
-            ))}
+            )}
           </List>
         </div>
       </div>
     </Drawer>
   )
 }
+
+export default GiftDrawer
+
 const useStyles = makeStyles(() => ({
   list: { width: 250 },
   header: { background: '#fff' },
   item: { padding: '0.1rem 16px' },
+  pleaseEntry: {
+    color: 'gray',
+    textAlign: 'center',
+  },
   no: {
     color: 'gray',
     width: '30px',

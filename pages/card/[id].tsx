@@ -23,9 +23,6 @@ import SettingDialog from '../../components/SettingDialog'
 import useAPI from '../../hooks/useAPI'
 
 export default function Card() {
-  const maxNumber = 75
-  const numOfNumbersOnCard = 25
-
   const router = useRouter()
   const { id: roomId } = router.query
 
@@ -44,47 +41,45 @@ export default function Card() {
   }, [])
 
   useEffect(() => {
-    // 初回読み込み
-
     if (room) {
-      if (room.number === '0') return
-      // 抽選画面から配信された数字
-      const target = numbers.find((n) => n.number === room.number)
-
-      // SnackBarを表示
-      if (room.status === 'started' && playerId) {
-        setSnackBar({
-          open: true,
-          message: `「${room.number}」が出ました！`,
-          type: target ? 'success' : 'info',
-        })
-      }
-
       // 確定済みの数字列を取得 もしくは 新規生成
       const me = room.players?.find((p) => p.id === playerId)
-      const myNumbers = toCardNumbers(
-        me && me.numbers
-          ? me.numbers
-          : generateNumbers(maxNumber, numOfNumbersOnCard)
+      let myNumbers = toCardNumbers(
+        me && me.numbers ? me.numbers : generateNumbers()
       )
 
-      // ルーム履歴にある数字をオープンにする
-      let result = myNumbers.map((n) => ({
-        ...n,
-        open: (n.open || room.history?.includes(n.number)) ?? false,
-      }))
+      // 完全にエントリーしてなければ表示しない
+      if (me && me.numbers) {
+        // ルーム履歴にある数字をオープンにする
+        myNumbers = myNumbers.map((n) => ({
+          ...n,
+          open: (n.open || room.history?.includes(n.number)) ?? false,
+        }))
 
-      // 新たに抽選された数字をオープンにする
-      if (target) {
-        result = [
-          ...result.map((n) => ({
-            ...n,
-            open: n === target ? !n.open : n.open,
-          })),
-        ]
+        if (room.number !== '0') {
+          // 抽選画面から配信された数字
+          const target = numbers.find((n) => n.number === room.number)
+
+          // 新たに抽選された数字をオープンにする
+          if (target) {
+            myNumbers = [
+              ...myNumbers.map((n) => ({
+                ...n,
+                open: n === target ? !n.open : n.open,
+              })),
+            ]
+          }
+
+          // SnackBarを表示
+          setSnackBar({
+            open: true,
+            message: `「${room.number}」が出ました！`,
+            type: target ? 'success' : 'info',
+          })
+        }
       }
 
-      setNumbers(checkBingo(result))
+      setNumbers(checkBingo(myNumbers))
     }
   }, [room])
 
@@ -126,21 +121,12 @@ export default function Card() {
     }
   }
 
-  const onClickRegenerate = () =>
-    setNumbers(toCardNumbers(generateNumbers(maxNumber, numOfNumbersOnCard)))
+  const onClickRegenerate = () => setNumbers(toCardNumbers(generateNumbers()))
 
   if (room) {
     return (
-      <View
-        {...{
-          room,
-          numbers,
-          playerId,
-          onClickSelect,
-          onClickRegenerate,
-          onClickNumber,
-        }}
-      />
+      // prettier-ignore
+      <View {...{ room, numbers, playerId, onClickSelect, onClickRegenerate, onClickNumber }} />
     )
   } else {
     return <LoadingView />
@@ -224,9 +210,9 @@ const View: React.FC<{
       <SettingDialog className={classes.setting} />
 
       <FAB />
-      <PlayerDrawer players={room.players ?? []} />
-      <GiftDrawer gifts={room.gifts ?? []} />
-      <HistoryDrawer history={room.history ?? []} />
+      <PlayerDrawer players={room.players ?? []} isEntered={!!me} />
+      <GiftDrawer gifts={room.gifts ?? []} isEntered={!!me} />
+      <HistoryDrawer history={room.history ?? []} isEntered={!!me} />
     </Container>
   )
 }

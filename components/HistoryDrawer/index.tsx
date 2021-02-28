@@ -5,11 +5,10 @@ import { BingoContext } from '../../contexts/BingoContext'
 import { makeStyles } from '@material-ui/core/styles'
 import { reverse } from '../../common/utils'
 
-interface Props {
+const HistoryDrawer: React.FC<{
   history: string[]
-}
-
-export default function HistoryDrawer({ history }: Props) {
+  isEntered: boolean
+}> = ({ history, isEntered }) => {
   const classes = useStyles()
 
   const { openHistoryDrawer: open, setOpenHistoryDrawer: setOpen } = useContext(
@@ -29,14 +28,23 @@ export default function HistoryDrawer({ history }: Props) {
         <div>
           <ListSubheader className={classes.header}>抽選履歴</ListSubheader>
           <List>
-            {reverse(history).map((h, i) => (
-              <ListItem key={i} className={classes.item}>
-                <ListItemText>
-                  <span className={classes.no}>{history.length - i}. </span>
-                  <span className={classes.number}>{h}</span>
+            {isEntered &&
+              reverse(history).map((h, i) => (
+                <ListItem key={i} className={classes.item}>
+                  <ListItemText>
+                    <span className={classes.no}>{history.length - i}. </span>
+                    <span className={classes.number}>{h}</span>
+                  </ListItemText>
+                </ListItem>
+              ))}
+
+            {!isEntered && (
+              <ListItem>
+                <ListItemText className={classes.pleaseEntry}>
+                  エントリーしてください
                 </ListItemText>
               </ListItem>
-            ))}
+            )}
           </List>
         </div>
       </div>
@@ -44,10 +52,16 @@ export default function HistoryDrawer({ history }: Props) {
   )
 }
 
+export default HistoryDrawer
+
 const useStyles = makeStyles(() => ({
   list: { width: 150 },
   header: { background: '#fff' },
   item: { padding: '0.1rem 16px' },
+  pleaseEntry: {
+    color: 'gray',
+    textAlign: 'center',
+  },
   no: {
     color: 'gray',
     width: '30px',
