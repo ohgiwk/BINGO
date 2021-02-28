@@ -5,7 +5,10 @@ import { Number } from '../../common/types'
 const Square = withStyles(() => ({
   root: {
     backgroundColor: '#fff',
-    '&:hover': { backgroundColor: '#fff' },
+
+    '&:hover': {
+      backgroundColor: '#fff',
+    },
   },
 }))(Button)
 
@@ -25,9 +28,9 @@ const NumberSquare: React.FC<{
       className={`
         ${classes.number}
         ${number.open && classes.opened}
-        ${number.reach && classes.reach}
-        ${number.bingo && classes.bingo}
         ${number.center && classes.center}
+        ${number.reach && !incorrect && classes.reach}
+        ${number.bingo && !incorrect && classes.bingo}
         ${number.open && incorrect && classes.incorrect}
       `}
       onClick={() => onClick(number)}
@@ -50,7 +53,12 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '50%',
     color: theme.palette.primary.main,
     background: '#fff',
-    transition: 'color 0.5s, background 0.5s',
+    transition: 'transform 0.1s, color 0.4s, background 0.4s',
+    boxShadow: '1px 1px 5px rgba(0, 0, 0, 0.2)!important',
+
+    '&:active': {
+      transform: 'scale(0.8)',
+    },
   },
   opened: {
     color: '#fff',
