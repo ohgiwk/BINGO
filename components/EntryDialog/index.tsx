@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useContext, useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import * as MUI from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
+import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Room } from '../../common/types'
@@ -63,7 +64,10 @@ const EntryDialog: React.FC<{
     <MUI.Dialog open={open} fullWidth>
       <MUI.DialogTitle>
         <div className={classes.title}>
-          ビンゴへ参加！
+          <div>
+            <EmojiPeopleIcon color="primary" className={classes.middle} />
+            <span className={classes.middle}>ビンゴへ参加！</span>
+          </div>
           <MUI.IconButton
             className={classes.close}
             onClick={() => setOpen(false)}
@@ -124,6 +128,7 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'space-between',
     lineHeight: '48px',
   },
+  middle: { verticalAlign: 'middle' },
   close: { position: 'relative', top: '-8px', left: '15px' },
   buttons: { textAlign: 'center' },
   divider: { margin: '1rem 0' },
