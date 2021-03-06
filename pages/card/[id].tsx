@@ -10,12 +10,8 @@ import { RemoveScroll } from 'react-remove-scroll'
 
 import { chunk } from '../../common/utils'
 import { Number, Room } from '../../common/types'
-import {
-  generateNumbers,
-  toCardNumbers,
-  checkBingo,
-  countBingo,
-} from '../../common/bingo'
+// prettier-ignore
+import { generateNumbers, toCardNumbers, checkBingo, countBingo } from '../../common/bingo'
 import { AppContext } from '../../contexts/AppContext'
 import { BingoContext } from '../../contexts/BingoContext'
 import FAB from '../../components/FAB'
@@ -42,6 +38,7 @@ export default function Card() {
 
   const [numbers, setNumbers] = useState<Number[]>([])
   const [room, setRoom] = useState<Room>()
+  const [count, setCount] = useState({ bingo: 0, reach: 0 })
   const [isBingo, setIsBingo] = useState<boolean>(false)
 
   useEffect(() => {
@@ -106,11 +103,15 @@ export default function Card() {
       ...numbers.map((n) => ({ ...n, open: n === num ? !n.open : n.open })),
     ])
     setNumbers(result)
-    const [bingo, reach] = countBingo(result)
-    if (bingo) {
+
+    const newCount = countBingo(result)
+
+    if (newCount.bingo > count.bingo) {
       setIsBingo(true)
       setTimeout(() => setIsBingo(false), 4000)
     }
+
+    setCount(newCount)
   }
 
   /**
@@ -222,7 +223,7 @@ const View: React.FC<{
 
           {props.playerId && !me?.numbers && (
             <>
-              <div>タップして番号を変更できます</div>
+              <div>タップして数字を変更できます</div>
               <Button
                 variant="contained"
                 color="primary"
@@ -237,7 +238,7 @@ const View: React.FC<{
                 className={classes.button}
                 onClick={props.onClickRegenerate}
               >
-                選び直す
+                シャッフル
               </Button>
             </>
           )}

@@ -124,9 +124,24 @@ function _checkDiagonal([...chunked]: Number[][], position: number[]) {
   return array
 }
 
+function countBingo(numbers: Number[]) {
+  function count(type: 'bingo' | 'reach') {
+    const chunked = [...chunk(numbers, 5)]
+    return [
+      ...chunked.map((arr) => arr.every((n) => n[type])),
+      ...transpose(chunked).map((arr) => arr.every((n) => n[type])),
+      range(chunked.length).every((i) => chunked[i][i][type]),
+      reverse(range(chunked.length)).every((n, i) => chunked[n][i][type]),
+    ].filter((n) => n).length
+  }
+
+  return { bingo: count('bingo'), reach: count('reach') }
+}
+
 export {
   generateNumbers,
   toCardNumbers,
+  countBingo,
   checkBingo,
   _checkHorizontal,
   _checkDiagonal,
