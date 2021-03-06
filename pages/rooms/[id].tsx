@@ -2,11 +2,11 @@ import { useState, useEffect, useContext } from 'react'
 // prettier-ignore
 import * as MUI from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import firebase from 'firebase'
+import firebase from '../../common/firebase'
 import { useRouter } from 'next/router'
 import moment from 'moment'
-
-import { range, chunk, shuffle, wait, substract } from '../../common/utils'
+// prettier-ignore
+import { range, chunk, shuffle, wait, substract, transpose, reverse } from '../../common/utils'
 import { Room } from '../../common/types'
 import useAPI from '../../hooks/useAPI'
 import FAB from '../../components/FAB'
@@ -15,13 +15,19 @@ import GiftDrawer from '../../components/GiftDrawer'
 import RippleNumber from '../../components/RippleNumber'
 import { AppContext } from '../../contexts/AppContext'
 import PlayerDrawer from '../../components/PlayerDrawer'
+import QRCode from 'qrcode.react'
 
 type Number = {
   value: string
   open: boolean
+  ripple: boolean
+  className: string
 }
 
+const database = firebase.database()
+
 export default function LotteryRoom() {
+  const classes = useStyles()
   const router = useRouter()
   const { id: roomId } = router.query as { id: string }
   const { updateRoom } = useAPI()
@@ -35,6 +41,8 @@ export default function LotteryRoom() {
     range(Math.ceil(maxNumber / 10) * 10, 1).map((n) => ({
       value: n <= maxNumber ? String(n) : '',
       open: false,
+      ripple: true,
+      className: '',
     }))
   )
   const [isValidRoomId, setIsValidRoomId] = useState(true)
@@ -45,7 +53,7 @@ export default function LotteryRoom() {
   useEffect(() => {
     setIsLoading(true)
 
-    const roomRef = firebase.database().ref('rooms/' + roomId)
+    const roomRef = database.ref('rooms/' + roomId)
     roomRef.on('value', (snapshot) => {
       const newRoom = snapshot.val() as Room
 
@@ -168,12 +176,57 @@ export default function LotteryRoom() {
     })
   }
 
+  function wave() {
+    numbers.filter((n) => (n.ripple = false))
+    const table = transpose(chunk(numbers, 10))
+
+    const promises = table.map((r, i) => {
+      return new Promise<void>((resolve) => {
+        const onTimer = setInterval(async () => {
+          await wait(i * 150)
+
+          const lastTruePos = reverse(r).findIndex((i) => i.open)
+          const index = lastTruePos < 0 ? 0 : r.length - lastTruePos
+          if (index >= 0 && index < r.length) {
+            r[index].open = true
+            r[index].className = classes.on
+          } else {
+            clearInterval(onTimer)
+          }
+        }, 80)
+
+        setTimeout(() => {
+          const offTimer = setInterval(async () => {
+            await wait(i * 150)
+
+            const index = r.findIndex((i) => i.open)
+            if (index >= 0) {
+              r[index].open = false
+              r[index].className = ''
+            } else {
+              clearInterval(offTimer)
+              resolve()
+            }
+          }, 80)
+        }, 800)
+      })
+    })
+
+    const update = setInterval(() => {
+      setNumbers(transpose(table).flat())
+    }, 50)
+
+    Promise.all(promises).then(() => {
+      clearInterval(update)
+    })
+  }
+
   if (isLoading) {
     return <LoadingView />
   } else if (isValidRoomId && room) {
     return (
       // prettier-ignore
-      <MainView {...{ room, numbers, number, open, running, onClick, onClickStart, onClickReset }}
+      <MainView {...{ room, numbers, number, open, running, onClick: wave, onClickStart, onClickReset }}
       />
     )
   } else {
@@ -251,7 +304,7 @@ const MainView: React.FC<{
         {chunk(props.numbers, 10).map((arr, i) => (
           <div key={i} className={classes.numbers}>
             {arr.map((number, j) => (
-              <RippleNumber key={j} {...{ number }} />
+              <RippleNumber key={j} {...number} />
             ))}
           </div>
         ))}
@@ -268,6 +321,12 @@ const MainView: React.FC<{
       {/* <div className={classes.info}>現在のビンゴ数: 1</div>
       <div className={classes.info}>現在のリーチ数: 1</div> */}
 
+      <QRCode
+        size={350}
+        value={`http://localhost:3000`}
+        className={classes.qr}
+      />
+      <div></div>
       <FAB className={classes.fab} />
       <PlayerDrawer players={room.players ?? []} isEntered={true} />
       <GiftDrawer gifts={room.gifts ?? []} isEntered={true} />
@@ -352,11 +411,24 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '30%',
     marginBottom: '1rem',
   },
+  qr: {
+    position: 'absolute',
+    bottom: '100px',
+    left: '50%',
+    marginLeft: '-175px',
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
+    borderRadius: '5px',
+    padding: '10px',
+    background: '#fff',
+  },
   loading: { position: 'absolute', top: '50%', left: '50%' },
   blinking: { animation: '$blinking 2s ease infinite' },
   '@keyframes blinking': {
     '0%': { opacity: '0' },
     '50%': { opacity: '1' },
     '100%': { opacity: '0' },
+  },
+  on: {
+    // transform: 'scale(1.2)',
   },
 }))
