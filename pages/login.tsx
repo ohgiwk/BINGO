@@ -1,5 +1,5 @@
 import React, { useState, useContext, KeyboardEvent } from 'react'
-import NextLink from 'next/Link'
+import NextLink from 'next/link'
 // prettier-ignore
 import { Link, Button, Card, CardContent, Container, TextField, Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'

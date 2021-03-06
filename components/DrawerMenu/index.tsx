@@ -7,7 +7,7 @@ import HomeIcon from '@material-ui/icons/Home'
 import SettingsIcon from '@material-ui/icons/Settings'
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
-import Link from 'next/Link'
+import Link from 'next/link'
 
 export default function DrawerMenu() {
   const [open, setOpen] = useState(false)
