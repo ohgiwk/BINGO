@@ -1,7 +1,7 @@
 // prettier-ignore
 import { useState, useEffect, useContext } from 'react'
 // prettier-ignore
-import { Container, Button, Typography, Backdrop } from '@material-ui/core'
+import { Container, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useRouter } from 'next/router'
 import firebase from 'firebase'
@@ -10,7 +10,12 @@ import { RemoveScroll } from 'react-remove-scroll'
 
 import { chunk } from '../../common/utils'
 import { Number, Room } from '../../common/types'
-import { generateNumbers, toCardNumbers, checkBingo } from '../../common/bingo'
+import {
+  generateNumbers,
+  toCardNumbers,
+  checkBingo,
+  countBingo,
+} from '../../common/bingo'
 import { AppContext } from '../../contexts/AppContext'
 import { BingoContext } from '../../contexts/BingoContext'
 import FAB from '../../components/FAB'
@@ -37,6 +42,7 @@ export default function Card() {
 
   const [numbers, setNumbers] = useState<Number[]>([])
   const [room, setRoom] = useState<Room>()
+  const [isBingo, setIsBingo] = useState<boolean>(false)
 
   useEffect(() => {
     const roomRef = firebase.database().ref('rooms/' + roomId)
@@ -100,6 +106,11 @@ export default function Card() {
       ...numbers.map((n) => ({ ...n, open: n === num ? !n.open : n.open })),
     ])
     setNumbers(result)
+    const [bingo, reach] = countBingo(result)
+    if (bingo) {
+      setIsBingo(true)
+      setTimeout(() => setIsBingo(false), 4000)
+    }
   }
 
   /**
@@ -134,10 +145,30 @@ export default function Card() {
 
   const onClickRegenerate = () => setNumbers(toCardNumbers(generateNumbers()))
 
+  useEffect(() => {
+    if (!playerId) {
+      const timer = setInterval(() => {
+        const list = numbers.filter((n) => !n.open)
+        const target = list[Math.floor(Math.random() * list.length)]
+        const isBingo = numbers.some((n) => n.bingo)
+
+        if (isBingo) {
+          setNumbers(toCardNumbers(generateNumbers()))
+        } else {
+          if (target) {
+            onClickNumber(target)
+          }
+        }
+      }, 2000)
+
+      return () => clearInterval(timer)
+    }
+  }, [numbers])
+
   if (room) {
     return (
       // prettier-ignore
-      <View {...{ room, numbers, playerId, onClickSelect, onClickRegenerate, onClickNumber }} />
+      <View {...{ room, numbers, playerId, isBingo, onClickSelect, onClickRegenerate, onClickNumber }} />
     )
   } else {
     return <LoadingView />
@@ -148,6 +179,7 @@ const View: React.FC<{
   room: Room
   numbers: Number[]
   playerId: string
+  isBingo: boolean
   onClickSelect: () => void
   onClickRegenerate: () => void
   onClickNumber: (num: Number) => void
@@ -162,12 +194,15 @@ const View: React.FC<{
         <Typography className={classes.roomId}>
           {props.playerId ? `エントリー中: ${me?.name}` : '未エントリー'}
         </Typography>
-        <div>
-          <h2 className={classes.title}> {room.name}</h2>
-          <h3 className={classes.date}>
-            {moment(room.startDate).format('YYYY年MM月DD日hh時mm分〜')}
-          </h3>
+
+        <div className={classes.title}>
+          <div className={classes.char}>B</div>
+          <div className={classes.char}>I</div>
+          <div className={classes.char}>N</div>
+          <div className={classes.char}>G</div>
+          <div className={classes.char}>O</div>
         </div>
+
         <div className={classes.numbers}>
           {chunk(props.numbers, 5).map((arr, i) => (
             <div key={i}>
@@ -217,8 +252,17 @@ const View: React.FC<{
           )}
         </div>
 
-        {/* <div className={classes.reach}>リーチ！！</div> */}
-        {/* <div className={`${classes.bingo} ${classes.appear}`}>BINGO!!</div> */}
+        <div>
+          <div className={classes.roomName}> {room.name}</div>
+          <div className={classes.date}>
+            {moment(room.startDate).format('YYYY年MM月DD日hh時mm分〜')}
+          </div>
+        </div>
+
+        {/* <div className={`${classes.reach} ${props.isReach && classes.appear}`}>リーチ！！</div> */}
+        <div className={`${classes.bingo} ${props.isBingo && classes.appear}`}>
+          BINGO!!
+        </div>
 
         <SettingDialog className={classes.setting} />
         <FAB />
@@ -239,14 +283,37 @@ const useStyles = makeStyles((theme) => ({
   container: {
     height: '100%',
     paddingTop: '64px',
-    paddingBottom: '6rem',
+    paddingBottom: '2rem',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
     overflow: 'hidden',
   },
-  title: { margin: '0' },
-  date: { margin: '0', fontSize: '0.7rem', color: '#676767' },
+  title: {
+    textAlign: 'center',
+    height: '40px',
+  },
+  char: {
+    color: '#ddd',
+    fontSize: '4.5rem',
+    fontWeight: 'bold',
+    width: '64px',
+    height: '64px',
+    display: 'inline-block',
+    margin: '0 0.2rem',
+  },
+  roomName: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    margin: '0',
+    color: '#676767',
+  },
+  date: {
+    textAlign: 'center',
+    margin: '0',
+    fontSize: '0.7rem',
+    color: '#676767',
+  },
   numbers: { textAlign: 'center', margin: '1rem 0' },
   button: { fontWeight: 'bold', color: '#fff', margin: '5px' },
   buttons: { textAlign: 'center' },
@@ -277,14 +344,16 @@ const useStyles = makeStyles((theme) => ({
     position: 'absolute',
     top: '50%',
     left: '50%',
-    marginLeft: '-85px',
+    marginLeft: '-110px',
     transform: 'rotate(-5deg) translateY(-200px)',
     textShadow: '2px 2px 5px rgba(0, 0, 0, 0.3)',
     transition: '0.3s',
+    letterSpacing: '0.5rem',
+    pointerEvents: 'none',
     opacity: 0,
   },
   appear: {
-    transform: 'rotate(-5deg) translateY(-250px)',
+    transform: 'rotate(-5deg) translateY(-250px) scale(1.2)',
     opacity: 1,
   },
 }))
