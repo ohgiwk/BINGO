@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 
 type SnackBarState = {
   open: boolean
