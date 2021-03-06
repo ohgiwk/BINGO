@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  node:
+    container_name: 'app'
+    image: node:lts
+    ports:
+      - 3000:3000
+    tty: true
+    volumes:
+      - .:/opt/bingo
+    environment:
+      FIREBASE_API_KEY: 'AIzaSyBr8ThdheZTTONHru0f4dh-JZbdQN3TBw4'
+      FIREBASE_AUTH_DOMAIN: 'let-sbingo.firebaseapp.com'
+      FIREBASE_PROJECT_ID: 'let-sbingo'
+      FIREBASE_STORAGE_BUCKET: 'let-sbingo.appspot.com'
+      FIREBASE_MESSAGING_SENDER_ID: '253452855228'
+      FIREBASE_APP_ID: '1:253452855228:web:433742c9c49208793dadb9'
+      FIREBASE_MEASUREMENT_ID: 'G-B8RYQ9J98Y'

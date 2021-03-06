@@ -4,7 +4,7 @@ import { useState, useEffect, useContext } from 'react'
 import { Container, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useRouter } from 'next/router'
-import firebase from 'firebase'
+import firebase from '../../common/firebase'
 import moment from 'moment'
 import { RemoveScroll } from 'react-remove-scroll'
 
@@ -26,6 +26,8 @@ import useAPI from '../../hooks/useAPI'
 import { THEME_COLORS } from '../../common/constants'
 import AppLoading from '../../components/AppLoading'
 
+const database = firebase.database()
+
 export default function Card() {
   const router = useRouter()
   const { id: roomId } = router.query
@@ -42,7 +44,7 @@ export default function Card() {
   const [isBingo, setIsBingo] = useState<boolean>(false)
 
   useEffect(() => {
-    const roomRef = firebase.database().ref('rooms/' + roomId)
+    const roomRef = database.ref('rooms/' + roomId)
     roomRef.on('value', (snapshot) => {
       setRoom(snapshot.val())
     })
