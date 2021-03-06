@@ -2,7 +2,7 @@ import '../styles/globals.css'
 import { useEffect } from 'react'
 
 import { AppProps } from 'next/app'
-import Layout from './Layout'
+import Layout from '../components/Layout'
 import useFirebase from '../hooks/useFirebase'
 import { AppContextProvider } from '../contexts/AppContext'
 import { BingoContextProvider } from '../contexts/BingoContext'

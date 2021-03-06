@@ -1,20 +1,15 @@
 import { useContext } from 'react'
-import {
-  AppBar,
-  Backdrop,
-  CircularProgress,
-  Toolbar,
-  Typography,
-} from '@material-ui/core'
+// prettier-ignore
+import { AppBar, Backdrop, CircularProgress, Toolbar, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { ThemeProvider, createMuiTheme, CssBaseline } from '@material-ui/core'
 
-import AppLoading from '../components/AppLoading'
-import DrawerMenu from '../components/DrawerMenu'
-import SnackBar from '../components/SnackBar'
+import AppLoading from './AppLoading'
+import DrawerMenu from './DrawerMenu'
+import SnackBar from './SnackBar'
 import { AppContext } from '../contexts/AppContext'
 import useAuth from '../hooks/useAuth'
-import ConfirmDialog from '../components/ConfirmDialog'
+import ConfirmDialog from './ConfirmDialog'
 
 const Layout: React.FC = ({ children }) => {
   const classes = useStyles()
