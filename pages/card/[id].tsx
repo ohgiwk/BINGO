@@ -5,7 +5,6 @@ import { Container, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useRouter } from 'next/router'
 import firebase from '../../common/firebase'
-import moment from 'moment'
 import { RemoveScroll } from 'react-remove-scroll'
 
 import { chunk } from '../../common/utils'
@@ -25,6 +24,7 @@ import SettingDialog from '../../components/SettingDialog'
 import useAPI from '../../hooks/useAPI'
 import { THEME_COLORS } from '../../common/constants'
 import AppLoading from '../../components/AppLoading'
+import RoomDetailDialog from '../../components/RoomDetailDialog'
 
 const database = firebase.database()
 
@@ -117,7 +117,7 @@ export default function Card() {
   }
 
   /**
-   * 数字の確定
+   * ビンゴカードの確定
    */
   function onClickSelect() {
     if (room) {
@@ -255,14 +255,10 @@ const View: React.FC<{
           )}
         </div>
 
-        <div>
-          <div className={classes.roomName}> {room.name}</div>
-          <div className={classes.date}>
-            {moment(room.startDate).format('YYYY年MM月DD日hh時mm分〜')}
-          </div>
+        <div className={classes.center}>
+          <RoomDetailDialog room={room} />
         </div>
 
-        {/* <div className={`${classes.reach} ${props.isReach && classes.appear}`}>リーチ！！</div> */}
         <div className={`${classes.bingo} ${props.isBingo && classes.appear}`}>
           BINGO!!
         </div>
@@ -286,7 +282,7 @@ const useStyles = makeStyles((theme) => ({
   container: {
     height: '100%',
     paddingTop: '64px',
-    paddingBottom: '2rem',
+    paddingBottom: '1.5rem',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -305,18 +301,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'inline-block',
     margin: '0 0.2rem',
   },
-  roomName: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    margin: '0',
-    color: '#676767',
-  },
-  date: {
-    textAlign: 'center',
-    margin: '0',
-    fontSize: '0.7rem',
-    color: '#676767',
-  },
   numbers: { textAlign: 'center', margin: '1rem 0' },
   button: { fontWeight: 'bold', color: '#fff', margin: '5px' },
   buttons: { textAlign: 'center' },
@@ -327,17 +311,8 @@ const useStyles = makeStyles((theme) => ({
     bottom: theme.spacing(3),
     left: theme.spacing(3),
   },
-  reach: {
-    color: theme.palette.primary.main,
-    fontSize: '3rem',
-    fontWeight: 'bold',
+  center: {
     textAlign: 'center',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginLeft: '-120px',
-    transform: 'rotate(-5deg) translateY(-200px)',
-    textShadow: '2px 2px 5px rgba(0, 0, 0, 0.3)',
   },
   bingo: {
     color: theme.palette.primary.main,
