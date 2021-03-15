@@ -15,7 +15,7 @@ import GiftDrawer from '../../components/GiftDrawer'
 import RippleNumber from '../../components/RippleNumber'
 import { AppContext } from '../../contexts/AppContext'
 import PlayerDrawer from '../../components/PlayerDrawer'
-import QRCode from 'qrcode.react'
+import QRPanel from '../../components/QRPanel'
 
 type Number = {
   value: string
@@ -274,7 +274,6 @@ const MainView: React.FC<{
           </MUI.Typography>
         </>
       )}
-
       {room.status !== 'started' ? (
         <MUI.Button
           variant="contained"
@@ -296,7 +295,6 @@ const MainView: React.FC<{
           抽選する！
         </MUI.Button>
       )}
-
       <div
         className={`
         ${classes.table} ${room.status !== 'started' && classes.prepare}`}
@@ -309,7 +307,6 @@ const MainView: React.FC<{
           </div>
         ))}
       </div>
-
       {/* <div className={classes.floatArea}>
         <ButtonGroup variant="text" color="primary">
           <Button onClick={onClickReset}>リセット</Button>
@@ -321,17 +318,12 @@ const MainView: React.FC<{
       {/* <div className={classes.info}>現在のビンゴ数: 1</div>
       <div className={classes.info}>現在のリーチ数: 1</div> */}
 
-      <QRCode
-        size={350}
-        value={`http://localhost:3000`}
-        className={classes.qr}
-      />
-      <div></div>
+      <QRPanel />
+
       <FAB className={classes.fab} />
       <PlayerDrawer players={room.players ?? []} isEntered={true} />
       <GiftDrawer gifts={room.gifts ?? []} isEntered={true} />
       <HistoryDrawer history={room.history ?? []} isEntered={true} />
-
       <MUI.Dialog open={props.open}>
         <MUI.DialogContent
           className={`${classes.dialogNumber} ${
@@ -410,16 +402,6 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '1.1rem',
     marginTop: '30%',
     marginBottom: '1rem',
-  },
-  qr: {
-    position: 'absolute',
-    bottom: '100px',
-    left: '50%',
-    marginLeft: '-175px',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
-    borderRadius: '5px',
-    padding: '10px',
-    background: '#fff',
   },
   loading: { position: 'absolute', top: '50%', left: '50%' },
   blinking: { animation: '$blinking 2s ease infinite' },
