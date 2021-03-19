@@ -2,13 +2,15 @@ import { useState, useEffect, useContext } from 'react'
 // prettier-ignore
 import * as MUI from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import firebase from '../../common/firebase'
 import { useRouter } from 'next/router'
 import moment from 'moment'
+
+import firebase from '../../common/firebase'
+
 // prettier-ignore
 import { range, chunk, shuffle, wait, substract, transpose, reverse } from '../../common/utils'
 import { Room } from '../../common/types'
-import useAPI from '../../hooks/useAPI'
+import API from '../../common/API'
 import FAB from '../../components/FAB'
 import HistoryDrawer from '../../components/HistoryDrawer'
 import GiftDrawer from '../../components/GiftDrawer'
@@ -30,7 +32,6 @@ export default function LotteryRoom() {
   const classes = useStyles()
   const router = useRouter()
   const { id: roomId } = router.query as { id: string }
-  const { updateRoom } = useAPI()
 
   const maxNumber = 75
 
@@ -134,7 +135,7 @@ export default function LotteryRoom() {
 
         if (room) {
           // 抽選履歴の更新
-          updateRoom(roomId, {
+          API.updateRoom(roomId, {
             ...room,
             number: newNumber,
             history: [...(room.history ?? []), newNumber],
@@ -151,7 +152,7 @@ export default function LotteryRoom() {
         primaryButtonText: 'OK',
         secondaryButtonText: 'キャンセル',
         onClickPrimaryButton: () => {
-          updateRoom(roomId, { ...room, status: 'started' })
+          API.updateRoom(roomId, { ...room, status: 'started' })
           closeDialog()
         },
         onClickSecondaryButton: () => closeDialog(),
@@ -167,7 +168,7 @@ export default function LotteryRoom() {
       secondaryButtonText: 'キャンセル',
       onClickPrimaryButton: () => {
         if (room) {
-          updateRoom(roomId, { ...room, number: '0', history: [] })
+          API.updateRoom(roomId, { ...room, number: '0', history: [] })
           setNumber('0')
           closeDialog()
         }
@@ -263,6 +264,15 @@ const MainView: React.FC<{
           >
             {props.number}
           </MUI.Typography>
+          <MUI.Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={props.onClick}
+            disabled={props.running}
+          >
+            抽選する！
+          </MUI.Button>
         </>
       ) : (
         <>
@@ -272,29 +282,18 @@ const MainView: React.FC<{
           <MUI.Typography className={classes.date}>
             {moment(room.startDate).format('YYYY年MM月DD日hh時mm分〜')}
           </MUI.Typography>
+          <MUI.Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={props.onClickStart}
+            disabled={props.running}
+          >
+            ビンゴを開始する！
+          </MUI.Button>
         </>
       )}
-      {room.status !== 'started' ? (
-        <MUI.Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={props.onClickStart}
-          disabled={props.running}
-        >
-          ビンゴを開始する！
-        </MUI.Button>
-      ) : (
-        <MUI.Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={props.onClick}
-          disabled={props.running}
-        >
-          抽選する！
-        </MUI.Button>
-      )}
+
       <div
         className={`
         ${classes.table} ${room.status !== 'started' && classes.prepare}`}

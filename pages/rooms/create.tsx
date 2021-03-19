@@ -5,14 +5,13 @@ import { makeStyles } from '@material-ui/core/styles'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 
-import useAPI from '../../hooks/useAPI'
+import API from '../../common/API'
 import { AppContext } from '../../contexts/AppContext'
 
 export default function createRoom() {
   const classes = useStyles()
 
   const { openDialog, closeDialog } = useContext(AppContext)
-  const { createRoom } = useAPI()
   const [name, setName] = useState<string>('')
   const [description, setDescription] = useState<string>('')
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
@@ -32,7 +31,7 @@ export default function createRoom() {
         setIsProgress(true)
 
         try {
-          await createRoom({
+          await API.createRoom({
             name,
             description,
             owner: '',

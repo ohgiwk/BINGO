@@ -6,7 +6,7 @@ import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Room } from '../../common/types'
-import useAPI from '../../hooks/useAPI'
+import API from '../../common/API'
 import { AppContext } from '../../contexts/AppContext'
 import { BingoContext } from '../../contexts/BingoContext'
 import { wait } from '../../common/utils'
@@ -17,7 +17,6 @@ const EntryDialog: React.FC<{
   setOpen: Dispatch<SetStateAction<boolean>>
 }> = ({ room, open, setOpen }) => {
   const classes = useStyles()
-  const { updateRoom } = useAPI()
   const { openDialog, closeDialog, setIsLoading } = useContext(AppContext)
   const { setPlayerId } = useContext(BingoContext)
 
@@ -34,7 +33,7 @@ const EntryDialog: React.FC<{
 
         // プレイヤーを追加
         const id = uuidv4()
-        await updateRoom(room.id, {
+        await API.updateRoom(room.id, {
           ...room,
           players: [...(room.players ?? []), { id, name, message }],
         })

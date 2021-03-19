@@ -21,7 +21,7 @@ import GiftDrawer from '../../components/GiftDrawer'
 import SpinnerIcon from '../../components/SpinnerIcon'
 import EntryButton from '../../components/EntryButton'
 import SettingDialog from '../../components/SettingDialog'
-import useAPI from '../../hooks/useAPI'
+import API from '../../common/API'
 import { THEME_COLORS } from '../../common/constants'
 import AppLoading from '../../components/AppLoading'
 import RoomDetailDialog from '../../components/RoomDetailDialog'
@@ -36,7 +36,6 @@ export default function Card() {
     AppContext
   )
   const { playerId } = useContext(BingoContext)
-  const { updateRoom } = useAPI()
 
   const [numbers, setNumbers] = useState<Number[]>([])
   const [room, setRoom] = useState<Room>()
@@ -137,7 +136,7 @@ export default function Card() {
                   }
                 : p
             ) ?? []
-          await updateRoom(room.id, { ...room, players })
+          await API.updateRoom(room.id, { ...room, players })
 
           closeDialog()
         },
@@ -170,8 +169,17 @@ export default function Card() {
 
   if (room) {
     return (
-      // prettier-ignore
-      <View {...{ room, numbers, playerId, isBingo, onClickSelect, onClickRegenerate, onClickNumber }} />
+      <View
+        {...{
+          room,
+          numbers,
+          playerId,
+          isBingo,
+          onClickSelect,
+          onClickRegenerate,
+          onClickNumber,
+        }}
+      />
     )
   } else {
     return <LoadingView />
