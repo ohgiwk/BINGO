@@ -1,18 +1,16 @@
 // prettier-ignore
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect } from 'react'
 // prettier-ignore
 import { Container, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useRouter } from 'next/router'
-import firebase from '../../common/firebase'
 import { RemoveScroll } from 'react-remove-scroll'
 
+import firebase from '../../common/firebase'
 import { chunk } from '../../common/utils'
 import { Number, Room } from '../../common/types'
-// prettier-ignore
-import { generateNumbers, toCardNumbers, checkBingo, countBingo } from '../../common/bingo'
-import { AppContext } from '../../contexts/AppContext'
-import { BingoContext } from '../../contexts/BingoContext'
+import useCard from '../../hooks/useCard'
+
 import FAB from '../../components/FAB'
 import NumberSquare from '../../components/NumberSquare'
 import PlayerDrawer from '../../components/PlayerDrawer'
@@ -21,8 +19,6 @@ import GiftDrawer from '../../components/GiftDrawer'
 import SpinnerIcon from '../../components/SpinnerIcon'
 import EntryButton from '../../components/EntryButton'
 import SettingDialog from '../../components/SettingDialog'
-import API from '../../common/API'
-import { THEME_COLORS } from '../../common/constants'
 import AppLoading from '../../components/AppLoading'
 import RoomDetailDialog from '../../components/RoomDetailDialog'
 
@@ -32,17 +28,21 @@ export default function Card() {
   const router = useRouter()
   const { id: roomId } = router.query
 
-  const { setSnackBar, openDialog, closeDialog, setPrimaryColor } = useContext(
-    AppContext
-  )
-  const { playerId } = useContext(BingoContext)
-
-  const [numbers, setNumbers] = useState<Number[]>([])
   const [room, setRoom] = useState<Room>()
-  const [count, setCount] = useState({ bingo: 0, reach: 0 })
-  const [isBingo, setIsBingo] = useState<boolean>(false)
+
+  const {
+    numbers,
+    isBingo,
+    playerId,
+    onUpdateRoom,
+    onClickNumber,
+    onClickSelect,
+    onClickRegenerate,
+    demoMode,
+  } = useCard()
 
   useEffect(() => {
+    // Room オブジェクトを監視
     const roomRef = database.ref('rooms/' + roomId)
     roomRef.on('value', (snapshot) => {
       setRoom(snapshot.val())
@@ -51,119 +51,13 @@ export default function Card() {
 
   useEffect(() => {
     if (room) {
-      let myNumbers = []
-      // 確定済みの数字列を取得 もしくは 新規生成
-      const me = room.players?.find((p) => p.id === playerId)
-      if (me && me.numbers) {
-        myNumbers = toCardNumbers(me.numbers)
-      } else {
-        setPrimaryColor(
-          THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]
-        )
-        myNumbers = toCardNumbers(generateNumbers())
-      }
-
-      // 完全にエントリーしてなければ表示しない
-      if (me && me.numbers) {
-        // ルーム履歴にある数字をオープンにする
-        myNumbers = myNumbers.map((n) => ({
-          ...n,
-          open: (n.open || room.history?.includes(n.number)) ?? false,
-        }))
-
-        if (room.number !== '0') {
-          // 抽選画面から配信された数字
-          const target = numbers.find((n) => n.number === room.number)
-
-          // 新たに抽選された数字をオープンにする
-          if (target) {
-            myNumbers = [
-              ...myNumbers.map((n) => ({
-                ...n,
-                open: n === target ? !n.open : n.open,
-              })),
-            ]
-          }
-
-          // SnackBarを表示
-          setSnackBar({
-            open: true,
-            message: `「${room.number}」が出ました！`,
-            type: target ? 'success' : 'info',
-          })
-        }
-      }
-
-      setNumbers(checkBingo(myNumbers))
+      onUpdateRoom(room)
     }
   }, [room])
 
-  function onClickNumber(num: Number) {
-    if (num.center) return
-    const result = checkBingo([
-      ...numbers.map((n) => ({ ...n, open: n === num ? !n.open : n.open })),
-    ])
-    setNumbers(result)
-
-    const newCount = countBingo(result)
-
-    if (newCount.bingo > count.bingo) {
-      setIsBingo(true)
-      setTimeout(() => setIsBingo(false), 4000)
-    }
-
-    setCount(newCount)
-  }
-
-  /**
-   * ビンゴカードの確定
-   */
-  function onClickSelect() {
-    if (room) {
-      openDialog({
-        text: 'ビンゴカードを確定してもよろしいですか？',
-        primaryButtonText: 'OK',
-        secondaryButtonText: 'キャンセル',
-        onClickPrimaryButton: async () => {
-          const players =
-            room.players?.map((p) =>
-              p.id === playerId
-                ? {
-                    ...p,
-                    numbers: numbers.map((n) => n.number),
-                    bingo: 0,
-                    reach: 0,
-                  }
-                : p
-            ) ?? []
-          await API.updateRoom(room.id, { ...room, players })
-
-          closeDialog()
-        },
-        onClickSecondaryButton: () => closeDialog(),
-      })
-    }
-  }
-
-  const onClickRegenerate = () => setNumbers(toCardNumbers(generateNumbers()))
-
   useEffect(() => {
     if (!playerId) {
-      const timer = setInterval(() => {
-        const list = numbers.filter((n) => !n.open)
-        const target = list[Math.floor(Math.random() * list.length)]
-        const isBingo = numbers.some((n) => n.bingo)
-
-        if (isBingo) {
-          setNumbers(toCardNumbers(generateNumbers()))
-        } else {
-          if (target) {
-            onClickNumber(target)
-          }
-        }
-      }, 2000)
-
-      return () => clearInterval(timer)
+      return demoMode()
     }
   }, [numbers])
 
@@ -182,7 +76,7 @@ export default function Card() {
       />
     )
   } else {
-    return <LoadingView />
+    return <AppLoading />
   }
 }
 
@@ -191,7 +85,7 @@ const View: React.FC<{
   numbers: Number[]
   playerId: string
   isBingo: boolean
-  onClickSelect: () => void
+  onClickSelect: (room: Room) => void
   onClickRegenerate: () => void
   onClickNumber: (num: Number) => void
 }> = (props) => {
@@ -238,7 +132,7 @@ const View: React.FC<{
                 variant="contained"
                 color="primary"
                 className={classes.button}
-                onClick={props.onClickSelect}
+                onClick={() => props.onClickSelect(room)}
               >
                 決定！
               </Button>
@@ -279,11 +173,6 @@ const View: React.FC<{
       </Container>
     </RemoveScroll>
   )
-}
-
-function LoadingView() {
-  const classes = useStyles()
-  return <AppLoading />
 }
 
 const useStyles = makeStyles((theme) => ({
