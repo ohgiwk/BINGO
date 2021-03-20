@@ -1,5 +1,6 @@
 import React, { createContext, useState } from 'react'
 import firebase from 'firebase/app'
+import { THEME_COLORS } from '../common/constants'
 
 type SnackBarState = {
   open: boolean
@@ -42,7 +43,7 @@ interface State {
 const AppContext = createContext<State>({} as State)
 
 function AppContextProvider(props: { children?: React.ReactNode }) {
-  const [primaryColor, setPrimaryColor] = useState('#ff89a3')
+  const [primaryColor, setPrimaryColor] = useState(THEME_COLORS[0])
   const [isAppLoading, setIsAppLoading] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [isAuth, setIsAuth] = useState(false)
