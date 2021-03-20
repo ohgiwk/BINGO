@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Container, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-
 import { useRouter } from 'next/router'
 import { RemoveScroll } from 'react-remove-scroll'
+import classNames from 'classnames'
 
 import firebase from '../../common/firebase'
 import { chunk } from '../../common/utils'
@@ -108,7 +108,12 @@ const View: React.FC<{
                   key={j}
                   number={num}
                   history={room.history ?? []}
-                  onClick={(num) => props.onClickNumber(num)}
+                  onClick={(num) => {
+                    if (me?.numbers) {
+                      props.onClickNumber(num)
+                    } else {
+                    }
+                  }}
                 />
               ))}
             </div>
@@ -131,7 +136,7 @@ const View: React.FC<{
 
               <Button
                 variant="contained"
-                className={classes.button}
+                className={classNames(classes.button, classes.shuffle)}
                 onClick={props.onClickRegenerate}
               >
                 シャッフル
@@ -188,6 +193,7 @@ const useStyles = makeStyles((theme) => ({
     margin: '0 0.2rem',
   },
   numbers: { textAlign: 'center', margin: '1rem 0' },
+  shuffle: { background: '#bbb' },
   button: { fontWeight: 'bold', color: '#fff', margin: '5px' },
   buttons: { textAlign: 'center' },
   setting: {
