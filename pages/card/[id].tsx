@@ -1,8 +1,7 @@
-// prettier-ignore
 import { useState, useEffect } from 'react'
-// prettier-ignore
-import { Container, Button, Typography } from '@material-ui/core'
+import { Container, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+
 import { useRouter } from 'next/router'
 import { RemoveScroll } from 'react-remove-scroll'
 
@@ -21,6 +20,7 @@ import EntryButton from '../../components/EntryButton'
 import SettingDialog from '../../components/SettingDialog'
 import AppLoading from '../../components/AppLoading'
 import RoomDetailDialog from '../../components/RoomDetailDialog'
+import PlayerMenu from '../../components/PlayerMenu'
 
 const database = firebase.database()
 
@@ -33,7 +33,7 @@ export default function Card() {
   const {
     numbers,
     isBingo,
-    playerId,
+    currentUser,
     onUpdateRoom,
     onClickNumber,
     onClickSelect,
@@ -56,7 +56,7 @@ export default function Card() {
   }, [room])
 
   useEffect(() => {
-    if (!playerId) {
+    if (!currentUser) {
       return demoMode()
     }
   }, [numbers])
@@ -67,7 +67,7 @@ export default function Card() {
         {...{
           room,
           numbers,
-          playerId,
+          currentUser,
           isBingo,
           onClickSelect,
           onClickRegenerate,
@@ -76,14 +76,14 @@ export default function Card() {
       />
     )
   } else {
-    return <AppLoading />
+    return <></>
   }
 }
 
 const View: React.FC<{
   room: Room
   numbers: Number[]
-  playerId: string
+  currentUser?: firebase.User
   isBingo: boolean
   onClickSelect: (room: Room) => void
   onClickRegenerate: () => void
@@ -91,14 +91,14 @@ const View: React.FC<{
 }> = (props) => {
   const classes = useStyles()
   const { room } = props
-  const me = room.players?.find((r) => r.id === props.playerId)
+  const me = room.players?.find((r) => r.id === props.currentUser?.uid)
 
   return (
     <RemoveScroll style={{ height: '100%' }}>
       <Container className={classes.container} maxWidth="xs">
-        <Typography className={classes.roomId}>
-          {props.playerId ? `エントリー中: ${me?.name}` : '未エントリー'}
-        </Typography>
+        <div style={{ marginLeft: 'auto' }}>
+          <PlayerMenu room={room} currentUser={props.currentUser} />
+        </div>
 
         <div className={classes.title}>
           <div className={classes.char}>B</div>
@@ -107,7 +107,6 @@ const View: React.FC<{
           <div className={classes.char}>G</div>
           <div className={classes.char}>O</div>
         </div>
-
         <div className={classes.numbers}>
           {chunk(props.numbers, 5).map((arr, i) => (
             <div key={i}>
@@ -123,9 +122,9 @@ const View: React.FC<{
           ))}
         </div>
         <div className={classes.buttons}>
-          {!props.playerId && <EntryButton {...{ room }} />}
+          {!props.currentUser && <EntryButton {...{ room }} />}
 
-          {props.playerId && !me?.numbers && (
+          {props.currentUser && !me?.numbers && (
             <>
               <div>タップして数字を変更できます</div>
               <Button
@@ -147,7 +146,7 @@ const View: React.FC<{
             </>
           )}
 
-          {props.playerId && me?.numbers && (
+          {room.status !== 'started' && props.currentUser && me?.numbers && (
             <div>
               <SpinnerIcon />
               <div style={{ marginTop: '1rem' }}>
@@ -156,15 +155,12 @@ const View: React.FC<{
             </div>
           )}
         </div>
-
         <div className={classes.center}>
           <RoomDetailDialog room={room} />
         </div>
-
         <div className={`${classes.bingo} ${props.isBingo && classes.appear}`}>
           BINGO!!
         </div>
-
         <SettingDialog className={classes.setting} />
         <FAB />
         <PlayerDrawer players={room.players ?? []} isEntered={!!me} />
@@ -187,7 +183,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     textAlign: 'center',
-    height: '40px',
+    height: '50px',
   },
   char: {
     color: '#ddd',
@@ -201,8 +197,6 @@ const useStyles = makeStyles((theme) => ({
   numbers: { textAlign: 'center', margin: '1rem 0' },
   button: { fontWeight: 'bold', color: '#fff', margin: '5px' },
   buttons: { textAlign: 'center' },
-
-  roomId: { color: 'gray', fontSize: '9px', textAlign: 'right' },
   setting: {
     position: 'absolute',
     bottom: theme.spacing(3),

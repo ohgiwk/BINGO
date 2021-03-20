@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 // prettier-ignore
 import { AppBar, Backdrop, CircularProgress, Toolbar, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -22,8 +22,12 @@ const Layout: React.FC = ({ children }) => {
     setSnackBar,
     confirmDialog,
   } = useContext(AppContext)
+
   const { initAuth } = useAuth()
-  initAuth()
+
+  useEffect(() => {
+    initAuth()
+  }, [])
 
   const theme = createMuiTheme({
     palette: {

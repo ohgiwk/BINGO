@@ -4,16 +4,18 @@ import { useContext, useState } from 'react'
 // prettier-ignore
 import { generateNumbers, toCardNumbers, checkBingo, countBingo } from '../common/bingo'
 import { AppContext } from '../contexts/AppContext'
-import { BingoContext } from '../contexts/BingoContext'
 import API from '../common/API'
 import { THEME_COLORS } from '../common/constants'
 import { Number, Room } from '../common/types'
 
 export default function useCard() {
-  const { setSnackBar, openDialog, closeDialog, setPrimaryColor } = useContext(
-    AppContext
-  )
-  const { playerId } = useContext(BingoContext)
+  const {
+    currentUser,
+    setSnackBar,
+    openDialog,
+    closeDialog,
+    setPrimaryColor,
+  } = useContext(AppContext)
 
   const [numbers, setNumbers] = useState<Number[]>([])
   const [count, setCount] = useState({ bingo: 0, reach: 0 })
@@ -27,13 +29,13 @@ export default function useCard() {
   function onUpdateRoom(room: Room) {
     let myNumbers = []
     // 確定済みの数字列を取得 もしくは 新規生成
-    const me = room.players?.find((p) => p.id === playerId)
+    const me = room.players?.find((p) => p.id === currentUser?.uid)
     if (me && me.numbers) {
       myNumbers = toCardNumbers(me.numbers)
     } else {
-      setPrimaryColor(
-        THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]
-      )
+      // setPrimaryColor(
+      //   THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)]
+      // )
       myNumbers = toCardNumbers(generateNumbers())
     }
 
@@ -103,7 +105,7 @@ export default function useCard() {
       onClickPrimaryButton: async () => {
         const players =
           room.players?.map((p) =>
-            p.id === playerId
+            p.id === currentUser?.uid
               ? {
                   ...p,
                   numbers: numbers.map((n) => n.number),
@@ -146,7 +148,7 @@ export default function useCard() {
     numbers,
     count,
     isBingo,
-    playerId,
+    currentUser,
     onUpdateRoom,
     onClickNumber,
     onClickSelect,

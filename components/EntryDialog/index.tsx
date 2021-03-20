@@ -3,13 +3,11 @@ import { makeStyles } from '@material-ui/core/styles'
 import * as MUI from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
 import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople'
-import { v4 as uuidv4 } from 'uuid'
 
+import firebase from '../../common/firebase'
 import { Room } from '../../common/types'
 import API from '../../common/API'
 import { AppContext } from '../../contexts/AppContext'
-import { BingoContext } from '../../contexts/BingoContext'
-import { wait } from '../../common/utils'
 
 const EntryDialog: React.FC<{
   room: Room
@@ -18,7 +16,6 @@ const EntryDialog: React.FC<{
 }> = ({ room, open, setOpen }) => {
   const classes = useStyles()
   const { openDialog, closeDialog, setIsLoading } = useContext(AppContext)
-  const { setPlayerId } = useContext(BingoContext)
 
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
@@ -31,27 +28,34 @@ const EntryDialog: React.FC<{
       onClickPrimaryButton: async () => {
         setIsLoading(true)
 
-        // プレイヤーを追加
-        const id = uuidv4()
-        await API.updateRoom(room.id, {
-          ...room,
-          players: [...(room.players ?? []), { id, name, message }],
-        })
+        const cred = await firebase.auth().signInAnonymously()
 
-        setPlayerId(id)
-        closeDialog()
+        if (cred.user) {
+          await cred.user.updateProfile({
+            displayName: name,
+          })
 
-        await wait(500)
-        setIsLoading(false)
+          await API.updateRoom(room.id, {
+            ...room,
+            players: [
+              ...(room.players ?? []),
+              { id: cred.user.uid, name, message },
+            ],
+          })
 
-        openDialog({
-          text: 'エントリーしました！',
-          primaryButtonText: 'OK',
-          onClickPrimaryButton: () => {
-            closeDialog()
-            setOpen(false)
-          },
-        })
+          closeDialog()
+
+          setIsLoading(false)
+
+          openDialog({
+            text: 'エントリーしました！',
+            primaryButtonText: 'OK',
+            onClickPrimaryButton: () => {
+              closeDialog()
+              setOpen(false)
+            },
+          })
+        }
       },
       onClickSecondaryButton: () => {
         closeDialog()
@@ -65,7 +69,7 @@ const EntryDialog: React.FC<{
         <div className={classes.title}>
           <div>
             <EmojiPeopleIcon color="primary" className={classes.middle} />
-            <span className={classes.middle}>ビンゴへ参加！</span>
+            <span className={classes.middle}>ビンゴへエントリー！</span>
           </div>
           <MUI.IconButton
             className={classes.close}

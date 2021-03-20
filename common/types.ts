@@ -6,6 +6,13 @@ export type Number = {
   center: boolean
 }
 
+export type RoomNumber = {
+  value: string
+  open: boolean
+  ripple: boolean
+  className: string
+}
+
 export type Player = {
   id: string
   name: string
