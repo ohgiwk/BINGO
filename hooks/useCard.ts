@@ -17,6 +17,7 @@ export default function useCard() {
     setPrimaryColor,
   } = useContext(AppContext)
 
+  const [room, setRoom] = useState<Room>()
   const [numbers, setNumbers] = useState<Number[]>([])
   const [count, setCount] = useState({ bingo: 0, reach: 0 })
   const [isBingo, setIsBingo] = useState<boolean>(false)
@@ -26,10 +27,11 @@ export default function useCard() {
    *
    * @param {Room} room
    */
-  function onUpdateRoom(room: Room) {
+  function onUpdateRoom(newRoom: Room) {
     let myNumbers = []
+
     // 確定済みの数字列を取得 もしくは 新規生成
-    const me = room.players?.find((p) => p.id === currentUser?.uid)
+    const me = newRoom.players?.find((p) => p.id === currentUser?.uid)
     if (me && me.numbers) {
       myNumbers = toCardNumbers(me.numbers)
     } else {
@@ -44,12 +46,12 @@ export default function useCard() {
       // ルーム履歴にある数字をオープンにする
       myNumbers = myNumbers.map((n) => ({
         ...n,
-        open: (n.open || room.history?.includes(n.number)) ?? false,
+        open: (n.open || newRoom.history?.includes(n.number)) ?? false,
       }))
 
-      if (room.number !== '0') {
+      if (newRoom.number !== '0') {
         // 抽選画面から配信された数字
-        const target = numbers.find((n) => n.number === room.number)
+        const target = numbers.find((n) => n.number === newRoom.number)
 
         // 新たに抽選された数字をオープンにする
         if (target) {
@@ -62,14 +64,18 @@ export default function useCard() {
         }
 
         // SnackBarを表示
-        setSnackBar({
-          open: true,
-          message: `「${room.number}」が出ました！`,
-          type: target ? 'success' : 'info',
-        })
+        // 初回読み込み時は表示しない
+        if (room) {
+          setSnackBar({
+            open: true,
+            message: `「${newRoom.number}」が出ました！`,
+            type: target ? 'success' : 'info',
+          })
+        }
       }
     }
 
+    setRoom(newRoom)
     setNumbers(checkBingo(myNumbers))
   }
 
@@ -145,6 +151,7 @@ export default function useCard() {
   }
 
   return {
+    room,
     numbers,
     count,
     isBingo,

@@ -28,9 +28,8 @@ export default function Card() {
   const router = useRouter()
   const { id: roomId } = router.query
 
-  const [room, setRoom] = useState<Room>()
-
   const {
+    room,
     numbers,
     isBingo,
     currentUser,
@@ -45,15 +44,9 @@ export default function Card() {
     // Room オブジェクトを監視
     const roomRef = database.ref('rooms/' + roomId)
     roomRef.on('value', (snapshot) => {
-      setRoom(snapshot.val())
+      onUpdateRoom(snapshot.val())
     })
   }, [])
-
-  useEffect(() => {
-    if (room) {
-      onUpdateRoom(room)
-    }
-  }, [room])
 
   useEffect(() => {
     if (!currentUser) {
