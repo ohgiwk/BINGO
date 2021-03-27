@@ -2,11 +2,11 @@
 import { useContext, useState } from 'react'
 
 // prettier-ignore
-import { generateNumbers, toCardNumbers, checkBingo, countBingo } from '../common/bingo'
-import { AppContext } from '../contexts/AppContext'
-import API from '../common/API'
-import { THEME_COLORS } from '../common/constants'
-import { Number, Room } from '../common/types'
+import { generateNumbers, toCardNumbers, checkBingo, countBingo } from 'common/bingo'
+import API from 'common/API'
+import { THEME_COLORS } from 'common/constants'
+import { Number, Room } from 'common/types'
+import { AppContext } from 'contexts/AppContext'
 
 export default function useCard() {
   const {

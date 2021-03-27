@@ -2,8 +2,9 @@ import { useState, useContext } from 'react'
 import * as MUI from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import SettingsIcon from '@material-ui/icons/Settings'
-import { AppContext } from '../../contexts/AppContext'
-import { THEME_COLORS } from '../../common/constants'
+
+import { AppContext } from 'contexts/AppContext'
+import { THEME_COLORS } from 'common/constants'
 
 const SettingDialog = (props: { className?: string }) => {
   const classes = useStyles()

@@ -1,8 +1,8 @@
 import * as MUI from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-
 import QRCode from 'qrcode.react'
-import { Room } from '../../common/types'
+
+import { Room } from 'common/types'
 
 const ShareDialog: React.FC<{
   room?: Room

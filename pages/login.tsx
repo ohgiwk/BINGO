@@ -3,8 +3,9 @@ import NextLink from 'next/link'
 // prettier-ignore
 import { Link, Button, Card, CardContent, Container, TextField, Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { AppContext } from '../contexts/AppContext'
-import useAuth from '../hooks/useAuth'
+
+import { AppContext } from 'contexts/AppContext'
+import useAuth from 'hooks/useAuth'
 
 export default function Login() {
   const { login } = useAuth()

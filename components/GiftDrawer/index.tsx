@@ -1,8 +1,9 @@
 import { useContext } from 'react'
 // prettier-ignore
 import { Drawer, List, ListItem, ListItemText, ListSubheader } from '@material-ui/core'
-import { BingoContext } from '../../contexts/BingoContext'
 import { makeStyles } from '@material-ui/core/styles'
+
+import { BingoContext } from 'contexts/BingoContext'
 
 const GiftDrawer: React.FC<{
   gifts: string[]

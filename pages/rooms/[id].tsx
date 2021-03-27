@@ -4,17 +4,17 @@ import { makeStyles } from '@material-ui/core/styles'
 import { useRouter } from 'next/router'
 import moment from 'moment'
 
-import firebase from '../../common/firebase'
-import { chunk } from '../../common/utils'
-import { Room, RoomNumber } from '../../common/types'
-import useRoom from '../../hooks/useRoom'
+import firebase from 'common/firebase'
+import { chunk } from 'common/utils'
+import { Room, RoomNumber } from 'common/types'
+import useRoom from 'hooks/useRoom'
 
-import FAB from '../../components/FAB'
-import HistoryDrawer from '../../components/HistoryDrawer'
-import GiftDrawer from '../../components/GiftDrawer'
-import RippleNumber from '../../components/RippleNumber'
-import PlayerDrawer from '../../components/PlayerDrawer'
-import QRPanel from '../../components/QRPanel'
+import FAB from 'components/FAB'
+import HistoryDrawer from 'components/HistoryDrawer'
+import GiftDrawer from 'components/GiftDrawer'
+import RippleNumber from 'components/RippleNumber'
+import PlayerDrawer from 'components/PlayerDrawer'
+import QRPanel from 'components/QRPanel'
 
 const database = firebase.database()
 

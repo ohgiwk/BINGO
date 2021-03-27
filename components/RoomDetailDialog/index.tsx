@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import * as MUI from '@material-ui/core'
 import moment from 'moment'
-import { Room } from '../../common/types'
 import { makeStyles } from '@material-ui/core'
+
+import { Room } from 'common/types'
 
 const RoomDetailDialog: React.FC<{ room: Room }> = ({ room }) => {
   const classes = useStyles()

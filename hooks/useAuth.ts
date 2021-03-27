@@ -3,7 +3,7 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import { useRouter } from 'next/router'
 
-import { AppContext } from '../contexts/AppContext'
+import { AppContext } from 'contexts/AppContext'
 
 const useAuth = () => {
   const {

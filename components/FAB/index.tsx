@@ -7,7 +7,8 @@ import CloseOutlinedIcon from '@material-ui/icons/CloseOutlined'
 
 import MenuIcon from '@material-ui/icons/Menu'
 import ListIcon from '@material-ui/icons/List'
-import { BingoContext } from '../../contexts/BingoContext'
+
+import { BingoContext } from 'contexts/BingoContext'
 
 export default function FAB(props: { className?: string }) {
   const classes = useStyles()

@@ -5,8 +5,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
 
-import API from '../../common/API'
-import { AppContext } from '../../contexts/AppContext'
+import API from 'common/API'
+import { AppContext } from 'contexts/AppContext'
 
 export default function createRoom() {
   const classes = useStyles()

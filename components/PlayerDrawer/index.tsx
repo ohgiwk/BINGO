@@ -1,11 +1,11 @@
 import { useContext } from 'react'
 // prettier-ignore
 import { Avatar, Drawer, List, ListItem, ListItemAvatar, ListItemText, ListSubheader } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
 import PersonIcon from '@material-ui/icons/Person'
 
-import { BingoContext } from '../../contexts/BingoContext'
-import { makeStyles } from '@material-ui/core/styles'
-import { Player } from '../../common/types'
+import { Player } from 'common/types'
+import { BingoContext } from 'contexts/BingoContext'
 
 const PlayerDrawer: React.FC<{
   players: Player[]

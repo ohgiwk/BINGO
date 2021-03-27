@@ -1,9 +1,10 @@
 import { useContext } from 'react'
 // prettier-ignore
 import { Drawer, List, ListItem, ListItemText, ListSubheader } from '@material-ui/core'
-import { BingoContext } from '../../contexts/BingoContext'
 import { makeStyles } from '@material-ui/core/styles'
-import { reverse } from '../../common/utils'
+
+import { BingoContext } from 'contexts/BingoContext'
+import { reverse } from 'common/utils'
 
 const HistoryDrawer: React.FC<{
   history: string[]

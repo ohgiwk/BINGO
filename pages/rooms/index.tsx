@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import * as MUI from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import firebase from '../../common/firebase'
 import Link from 'next/link'
 
-import ShareDialog from '../../components/ShareDialog'
-import { Room } from '../../common/types'
+import firebase from 'common/firebase'
+import { Room } from 'common/types'
+import ShareDialog from 'components/ShareDialog'
 
 const database = firebase.database()
 

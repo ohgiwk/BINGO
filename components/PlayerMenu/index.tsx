@@ -4,10 +4,10 @@ import { makeStyles } from '@material-ui/core/styles'
 import FaceIcon from '@material-ui/icons/Face'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 
-import API from '../../common/API'
-import firebase from '../../common/firebase'
-import { AppContext } from '../../contexts/AppContext'
-import { Room } from '../../common/types'
+import API from 'common/API'
+import firebase from 'common/firebase'
+import { AppContext } from 'contexts/AppContext'
+import { Room } from 'common/types'
 
 const PlayerMenu: React.FC<{ room: Room; currentUser?: firebase.User }> = ({
   room,

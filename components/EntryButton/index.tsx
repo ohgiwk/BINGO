@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
-import EntryDialog from '../../components/EntryDialog'
-import { Room } from '../../common/types'
+import EntryDialog from 'components/EntryDialog'
+import { Room } from 'common/types'
 
 function EntryButton(props: { room: Room }) {
   const classes = useStyles()

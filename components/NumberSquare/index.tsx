@@ -1,6 +1,7 @@
 import { Button } from '@material-ui/core'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
-import { Number } from '../../common/types'
+
+import { Number } from 'common/types'
 
 const Square = withStyles(() => ({
   root: {

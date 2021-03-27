@@ -4,11 +4,12 @@ import { AppBar, Backdrop, CircularProgress, Toolbar, Typography } from '@materi
 import { makeStyles } from '@material-ui/core/styles'
 import { ThemeProvider, createMuiTheme, CssBaseline } from '@material-ui/core'
 
+import { AppContext } from 'contexts/AppContext'
+import useAuth from 'hooks/useAuth'
+
 import AppLoading from './AppLoading'
 import DrawerMenu from './DrawerMenu'
 import SnackBar from './SnackBar'
-import { AppContext } from '../contexts/AppContext'
-import useAuth from '../hooks/useAuth'
 import ConfirmDialog from './ConfirmDialog'
 
 const Layout: React.FC = ({ children }) => {

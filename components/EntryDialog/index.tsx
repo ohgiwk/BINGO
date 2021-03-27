@@ -4,10 +4,10 @@ import * as MUI from '@material-ui/core'
 import CloseIcon from '@material-ui/icons/Close'
 import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople'
 
-import firebase from '../../common/firebase'
-import { Room } from '../../common/types'
-import API from '../../common/API'
-import { AppContext } from '../../contexts/AppContext'
+import firebase from 'common/firebase'
+import { Room } from 'common/types'
+import API from 'common/API'
+import { AppContext } from 'contexts/AppContext'
 
 const EntryDialog: React.FC<{
   room: Room

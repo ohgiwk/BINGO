@@ -1,9 +1,9 @@
 import { useState, useContext } from 'react'
 // prettier-ignore
-import { range, chunk, shuffle, wait, substract, transpose, reverse, } from '../common/utils'
-import API from '../common/API'
-import { AppContext } from '../contexts/AppContext'
-import { Room, RoomNumber } from '../common/types'
+import { range, chunk, shuffle, wait, substract, transpose, reverse, } from 'common/utils'
+import API from 'common/API'
+import { Room, RoomNumber } from 'common/types'
+import { AppContext } from 'contexts/AppContext'
 
 export default function useRoom() {
   const maxNumber = 75

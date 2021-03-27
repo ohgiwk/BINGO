@@ -2,10 +2,10 @@ import '../styles/globals.css'
 import { useEffect } from 'react'
 import { AppProps } from 'next/app'
 
-import '../common/firebase'
-import Layout from '../components/Layout'
-import { AppContextProvider } from '../contexts/AppContext'
-import { BingoContextProvider } from '../contexts/BingoContext'
+import 'common/firebase'
+import { AppContextProvider } from 'contexts/AppContext'
+import { BingoContextProvider } from 'contexts/BingoContext'
+import Layout from 'components/Layout'
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
