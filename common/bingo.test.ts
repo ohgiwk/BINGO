@@ -10,7 +10,7 @@ describe('Test bingo.ts', () => {
   test('Test generateNumbers', () => {
     const maxNum = 75
     const count = 25
-    const result = generateNumbers(maxNum, count)
+    const result = generateNumbers()
 
     // 指定長か
     expect(result).toHaveLength(count)
