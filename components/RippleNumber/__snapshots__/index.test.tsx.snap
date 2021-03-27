@@ -4,9 +4,10 @@ exports[`RippleNumber Snapshot Test 1`] = `
 <div
   className="
         makeStyles-num-1
-        false
+        
         makeStyles-ripple-3
-        false
+        
+        
       "
 >
   0

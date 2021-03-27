@@ -1,22 +1,24 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 
-type Number = {
+const RippleNumber: React.FC<{
   value: string
   open: boolean
-}
-const RippleNumber: React.FC<{ number: Number }> = ({ number }) => {
+  ripple: boolean
+  className?: string
+}> = (props) => {
   const classes = useStyles()
   return (
     <div
       className={`
         ${classes.num}
-        ${number.open && classes.open}
+        ${props.open ? classes.open : ''}
         ${classes.ripple}
-        ${number.open && classes.onRipple}
+        ${props.open && props.ripple ? classes.onRipple : ''}
+        ${props.className ?? ''}
       `}
     >
-      {number.value}
+      {props.value}
     </div>
   )
 }
@@ -32,6 +34,10 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: '40px',
     textAlign: 'center',
     userSelect: 'none',
+    transition: 'color 0.5s, transform 0.4s',
+    '&:hover': {
+      transform: 'scale(1.4)',
+    },
   },
   open: { color: theme.palette.primary.main },
   ripple: {
