@@ -52,7 +52,7 @@ const Admin: React.FC<{}> = () => {
                   <MUI.Checkbox />
                 </MUI.ListItemIcon>
 
-                <Link href={`/room/${r.id}`}>
+                <Link href={`/rooms/${r.id}`}>
                   <MUI.ListItemText>
                     <MUI.Link>{r.name}</MUI.Link>
                   </MUI.ListItemText>
