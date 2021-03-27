@@ -21,18 +21,18 @@ export default QRPanel
 const useStyles = makeStyles(() => ({
   qr: {
     position: 'absolute',
-    bottom: '30px',
-    left: '30px',
-    opacity: 0.4,
+    bottom: '10px',
+    left: '15px',
+    opacity: 0.3,
     transformOrigin: 'bottom left',
     transform: 'scale(0.15)',
     marginLeft: '0px',
     transition:
       'bottom 0.5s, left 0.5s, transform 0.5s, opacity 0.5s, margin 0.5s',
     padding: '10px',
+    borderRadius: '5px',
   },
   open: {
-    position: 'absolute',
     bottom: '100px',
     left: '50%',
     transform: 'scale(1)',
@@ -40,7 +40,6 @@ const useStyles = makeStyles(() => ({
 
     marginLeft: '-175px',
     boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
-    borderRadius: '5px',
     background: '#fff',
   },
 }))

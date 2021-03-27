@@ -19,7 +19,8 @@ const NumberSquare: React.FC<{
 }> = ({ number, history, onClick }) => {
   const classes = useStyles()
 
-  const incorrect = !number.center && !history.includes(number.number)
+  // const incorrect = !number.center && !history.includes(number.number)
+  const incorrect = false
 
   return (
     <Square
