@@ -117,7 +117,7 @@ const View: React.FC<{
                   number={num}
                   history={room.history ?? []}
                   onClick={(num) => {
-                    if (me?.numbers) {
+                    if (!me || me?.numbers) {
                       props.onClickNumber(num)
                     } else {
                       setSelected(5 * i + j)
