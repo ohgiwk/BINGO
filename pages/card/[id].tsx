@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Container, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useRouter } from 'next/router'
 import { RemoveScroll } from 'react-remove-scroll'
 import classNames from 'classnames'
 
-import firebase from '../../common/firebase'
-import { chunk } from '../../common/utils'
-import { Number, Room } from '../../common/types'
-import useCard from '../../hooks/useCard'
+import firebase from 'common/firebase'
+import { chunk } from 'common/utils'
+import { Number as CardNumber, Room } from 'common/types'
+import useCard from 'hooks/useCard'
 
 import FAB from '../../components/FAB'
 import NumberSquare from '../../components/NumberSquare'
@@ -21,6 +21,7 @@ import SettingDialog from '../../components/SettingDialog'
 import AppLoading from '../../components/AppLoading'
 import RoomDetailDialog from '../../components/RoomDetailDialog'
 import PlayerMenu from '../../components/PlayerMenu'
+import ChangeNumberDialog from '../../components/ChangeNumberDialog'
 
 const database = firebase.database()
 
@@ -38,6 +39,7 @@ export default function Card() {
     onClickSelect,
     onClickRegenerate,
     demoMode,
+    updateNumber,
   } = useCard()
 
   useEffect(() => {
@@ -65,6 +67,7 @@ export default function Card() {
           onClickSelect,
           onClickRegenerate,
           onClickNumber,
+          updateNumber,
         }}
       />
     )
@@ -75,16 +78,20 @@ export default function Card() {
 
 const View: React.FC<{
   room: Room
-  numbers: Number[]
+  numbers: CardNumber[]
   currentUser?: firebase.User
   isBingo: boolean
   onClickSelect: (room: Room) => void
   onClickRegenerate: () => void
-  onClickNumber: (num: Number) => void
+  onClickNumber: (num: CardNumber) => void
+  updateNumber: (index: number, newValue: number) => void
 }> = (props) => {
   const classes = useStyles()
   const { room } = props
   const me = room.players?.find((r) => r.id === props.currentUser?.uid)
+
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState<number>(0)
 
   return (
     <RemoveScroll style={{ height: '100%' }}>
@@ -100,6 +107,7 @@ const View: React.FC<{
           <div className={classes.char}>G</div>
           <div className={classes.char}>O</div>
         </div>
+
         <div className={classes.numbers}>
           {chunk(props.numbers, 5).map((arr, i) => (
             <div key={i}>
@@ -112,6 +120,8 @@ const View: React.FC<{
                     if (me?.numbers) {
                       props.onClickNumber(num)
                     } else {
+                      setSelected(5 * i + j)
+                      setOpen(true)
                     }
                   }}
                 />
@@ -153,12 +163,26 @@ const View: React.FC<{
             </div>
           )}
         </div>
-        <div className={classes.center}>
-          <RoomDetailDialog room={room} />
-        </div>
+
         <div className={`${classes.bingo} ${props.isBingo && classes.appear}`}>
           BINGO!!
         </div>
+
+        <div className={classes.center}>
+          <RoomDetailDialog room={room} />
+        </div>
+
+        <ChangeNumberDialog
+          {...{
+            open,
+            setOpen,
+            number: Number(props.numbers[selected]?.number ?? 0),
+            onClickButton: (n: number) => {
+              props.updateNumber(selected, n)
+            },
+          }}
+        />
+
         <SettingDialog className={classes.setting} />
         <FAB />
         <PlayerDrawer players={room.players ?? []} isEntered={!!me} />

@@ -150,6 +150,11 @@ export default function useCard() {
     return () => clearInterval(timer)
   }
 
+  function updateNumber(index: number, newValue: number) {
+    numbers[index].number = String(newValue)
+    setNumbers(numbers)
+  }
+
   return {
     room,
     numbers,
@@ -161,5 +166,6 @@ export default function useCard() {
     onClickSelect,
     onClickRegenerate,
     demoMode,
+    updateNumber,
   }
 }
