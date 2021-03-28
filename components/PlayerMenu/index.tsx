@@ -9,14 +9,14 @@ import firebase from 'common/firebase'
 import { AppContext } from 'contexts/AppContext'
 import { Room } from 'common/types'
 
-const PlayerMenu: React.FC<{ room: Room; currentUser?: firebase.User }> = ({
-  room,
-  currentUser,
-}) => {
+const PlayerMenu: React.FC<{
+  room: Room
+  currentUser?: firebase.User
+}> = ({ room, currentUser }) => {
   const classes = useStyles()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const { setIsLoading } = useContext(AppContext)
+  const { setIsLoading, openDialog, closeDialog } = useContext(AppContext)
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
@@ -27,16 +27,34 @@ const PlayerMenu: React.FC<{ room: Room; currentUser?: firebase.User }> = ({
   }
 
   const leaveTheRoom = async () => {
-    setIsLoading(true)
-    await firebase.auth().signOut()
+    handleClose()
 
-    await API.updateRoom(room.id, {
-      ...room,
-      players: room.players?.filter((p) => p.id !== currentUser?.uid) ?? [],
+    openDialog({
+      text: 'ルームから退室してもよろしいですか？',
+      primaryButtonText: 'OK',
+      secondaryButtonText: 'キャンセル',
+      onClickPrimaryButton: async () => {
+        setIsLoading(true)
+        closeDialog()
+
+        await firebase.auth().signOut()
+
+        await API.updateRoom(room.id, {
+          ...room,
+          players: room.players?.filter((p) => p.id !== currentUser?.uid) ?? [],
+        })
+
+        setAnchorEl(null)
+        setIsLoading(false)
+
+        openDialog({
+          text: 'ルームから退室しました',
+          primaryButtonText: 'OK',
+          onClickPrimaryButton: () => closeDialog(),
+        })
+      },
+      onClickSecondaryButton: () => closeDialog(),
     })
-
-    setAnchorEl(null)
-    setIsLoading(false)
   }
 
   return (
