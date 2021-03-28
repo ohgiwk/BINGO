@@ -7,7 +7,7 @@ import classNames from 'classnames'
 
 import firebase from 'common/firebase'
 import { chunk } from 'common/utils'
-import { Number as CardNumber, Room } from 'common/types'
+import { CardNumber, Room } from 'common/types'
 import useCard from 'hooks/useCard'
 
 import FAB from 'components/FAB'
