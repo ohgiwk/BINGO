@@ -177,6 +177,7 @@ const View: React.FC<{
             open,
             setOpen,
             number: Number(props.numbers[selected]?.number ?? 0),
+            numbers: props.numbers,
             onClickButton: (n: number) => {
               props.updateNumber(selected, n)
             },
