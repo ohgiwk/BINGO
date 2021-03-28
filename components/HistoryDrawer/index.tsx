@@ -2,14 +2,17 @@ import { useContext } from 'react'
 // prettier-ignore
 import { Drawer, List, ListItem, ListItemText, ListSubheader } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import classNames from 'classnames'
 
 import { BingoContext } from 'contexts/BingoContext'
 import { reverse } from 'common/utils'
+import { CardNumber } from 'common/types'
 
 const HistoryDrawer: React.FC<{
   history: string[]
   isEntered: boolean
-}> = ({ history, isEntered }) => {
+  numbers?: CardNumber[]
+}> = ({ history, isEntered, numbers }) => {
   const classes = useStyles()
 
   const { openHistoryDrawer: open, setOpenHistoryDrawer: setOpen } = useContext(
@@ -17,6 +20,7 @@ const HistoryDrawer: React.FC<{
   )
 
   const toggleDrawer = (val?: boolean) => setOpen(val ?? !open)
+  const opens = numbers?.filter((n) => n.open).map((n) => n.number) ?? []
 
   return (
     <Drawer anchor="right" open={open} onClose={() => toggleDrawer(false)}>
@@ -34,7 +38,13 @@ const HistoryDrawer: React.FC<{
                 <ListItem key={i} className={classes.item}>
                   <ListItemText>
                     <span className={classes.no}>{history.length - i}. </span>
-                    <span className={classes.number}>{h}</span>
+                    <span
+                      className={classNames(classes.number, {
+                        [`${classes.open}`]: opens.includes(h),
+                      })}
+                    >
+                      {h}
+                    </span>
                   </ListItemText>
                 </ListItem>
               ))}
@@ -55,7 +65,7 @@ const HistoryDrawer: React.FC<{
 
 export default HistoryDrawer
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   list: { width: 150 },
   header: { background: '#fff' },
   item: { padding: '0.1rem 16px' },
@@ -72,5 +82,8 @@ const useStyles = makeStyles(() => ({
     marginLeft: '1rem',
     fontWeight: 'normal',
     fontSize: '1.4rem',
+  },
+  open: {
+    color: theme.palette.primary.main,
   },
 }))

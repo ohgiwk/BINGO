@@ -187,7 +187,11 @@ const View: React.FC<{
         <FAB />
         <PlayerDrawer players={room.players ?? []} isEntered={!!me} />
         <GiftDrawer gifts={room.gifts ?? []} isEntered={!!me} />
-        <HistoryDrawer history={room.history ?? []} isEntered={!!me} />
+        <HistoryDrawer
+          history={room.history ?? []}
+          isEntered={!!me}
+          numbers={props.numbers}
+        />
       </Container>
     </RemoveScroll>
   )
