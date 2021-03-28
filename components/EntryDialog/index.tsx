@@ -26,6 +26,8 @@ const EntryDialog: React.FC<{
       primaryButtonText: 'OK',
       secondaryButtonText: 'キャンセル',
       onClickPrimaryButton: async () => {
+        setOpen(false)
+        closeDialog()
         setIsLoading(true)
 
         const cred = await firebase.auth().signInAnonymously()
@@ -43,8 +45,6 @@ const EntryDialog: React.FC<{
             ],
           })
 
-          closeDialog()
-
           setIsLoading(false)
 
           openDialog({
@@ -52,7 +52,6 @@ const EntryDialog: React.FC<{
             primaryButtonText: 'OK',
             onClickPrimaryButton: () => {
               closeDialog()
-              setOpen(false)
             },
           })
         }
