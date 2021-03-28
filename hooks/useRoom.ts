@@ -3,17 +3,17 @@ import { useState, useContext } from 'react'
 import { range, chunk, shuffle, wait, substract, transpose, reverse, } from 'common/utils'
 import API from 'common/API'
 import { Room, RoomNumber } from 'common/types'
+import { MAX_BINGO_NUMBER } from 'common/constants'
 import { AppContext } from 'contexts/AppContext'
 
 export default function useRoom() {
-  const maxNumber = 75
   const { openDialog, closeDialog, setSnackBar } = useContext(AppContext)
 
   const [room, setRoom] = useState<Room>()
   const [number, setNumber] = useState<string>('0')
   const [numbers, setNumbers] = useState<RoomNumber[]>(
-    range(Math.ceil(maxNumber / 10) * 10, 1).map((n) => ({
-      value: n <= maxNumber ? String(n) : '',
+    range(Math.ceil(MAX_BINGO_NUMBER / 10) * 10, 1).map((n) => ({
+      value: n <= MAX_BINGO_NUMBER ? String(n) : '',
       open: false,
       ripple: true,
       className: '',

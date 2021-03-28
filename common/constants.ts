@@ -7,5 +7,6 @@ export const THEME_COLORS = [
   '#673ab7',
   '#ff5722',
   '#b5c50f',
-  // '#3f51b5',
 ]
+
+export const MAX_BINGO_NUMBER = 75

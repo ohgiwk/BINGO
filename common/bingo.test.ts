@@ -5,10 +5,11 @@ import {
   _checkDiagonal,
 } from './bingo'
 import { unique, max } from './utils'
+import { MAX_BINGO_NUMBER } from 'common/constants'
 
 describe('Test bingo.ts', () => {
   test('Test generateNumbers', () => {
-    const maxNum = 75
+    const maxNum = MAX_BINGO_NUMBER
     const count = 25
     const result = generateNumbers()
 
