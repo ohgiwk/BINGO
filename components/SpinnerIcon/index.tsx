@@ -1,13 +1,14 @@
 import { makeStyles } from '@material-ui/core/styles'
+import classNames from 'classnames'
 
 export default function SpinnerIcon(props: { className?: string }) {
   const classes = useStyles()
   return (
     <div className={props.className}>
-      <div className={`${classes.spinner}`}>
-        <div className={`${classes.inner} ${classes.bounce1}`}></div>
-        <div className={`${classes.inner} ${classes.bounce2}`}></div>
-        <div className={`${classes.inner}`}></div>
+      <div className={classNames(classes.spinner)}>
+        <div className={classNames(classes.inner, classes.bounce1)}></div>
+        <div className={classNames(classes.inner, classes.bounce2)}></div>
+        <div className={classNames(classes.inner)}></div>
       </div>
     </div>
   )
@@ -29,12 +30,8 @@ const useStyles = makeStyles((theme) => ({
     display: 'inline-block',
     animation: '$bouncedelay 1.4s infinite ease-in-out both',
   },
-  bounce1: {
-    animationDelay: '-0.32s',
-  },
-  bounce2: {
-    animationDelay: '-0.16s',
-  },
+  bounce1: { animationDelay: '-0.32s' },
+  bounce2: { animationDelay: '-0.16s' },
   '@keyframes bouncedelay': {
     '0%, 80%, 100%': {
       transform: 'scale(0)',

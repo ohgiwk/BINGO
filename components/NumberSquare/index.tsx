@@ -1,5 +1,6 @@
 import { Button } from '@material-ui/core'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
+import classNames from 'classnames'
 
 import { Number } from 'common/types'
 
@@ -27,14 +28,13 @@ const NumberSquare: React.FC<{
     <Square
       disableElevation
       variant="contained"
-      className={`
-        ${classes.number}
-        ${number.open && classes.opened}
-        ${number.center && classes.center}
-        ${number.reach && !incorrect && classes.reach}
-        ${number.bingo && !incorrect && classes.bingo}
-        ${number.open && incorrect && classes.incorrect}
-      `}
+      className={classNames(classes.number, {
+        [`${classes.opened}`]: number.open,
+        [`${classes.center}`]: number.center,
+        [`${classes.reach}`]: number.reach && !incorrect,
+        [`${classes.bingo}`]: number.bingo && !incorrect,
+        [`${classes.incorrect}`]: number.open && incorrect,
+      })}
       onClick={() => onClick(number)}
     >
       {number.number}

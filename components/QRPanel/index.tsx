@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import QRCode from 'qrcode.react'
+import classNames from 'classnames'
 
 const QRPanel: React.FC<{}> = (props) => {
   const classes = useStyles()
@@ -10,7 +11,7 @@ const QRPanel: React.FC<{}> = (props) => {
     <QRCode
       size={350}
       value={`http://localhost:3000`}
-      className={`${classes.qr} ${open ? classes.open : ''}`}
+      className={classNames(classes.qr, { [`${classes.open}`]: open })}
       onClick={() => setOpen(!open)}
     />
   )

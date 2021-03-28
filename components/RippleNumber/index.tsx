@@ -1,6 +1,12 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
+import classNames from 'classnames'
 
+/**
+ *
+ * @param props
+ * @returns
+ */
 const RippleNumber: React.FC<{
   value: string
   open: boolean
@@ -10,13 +16,10 @@ const RippleNumber: React.FC<{
   const classes = useStyles()
   return (
     <div
-      className={`
-        ${classes.num}
-        ${props.open ? classes.open : ''}
-        ${classes.ripple}
-        ${props.open && props.ripple ? classes.onRipple : ''}
-        ${props.className ?? ''}
-      `}
+      className={classNames(props.className, classes.num, classes.ripple, {
+        [`${classes.onRipple}`]: props.open && props.ripple,
+        [`${classes.open}`]: props.open,
+      })}
     >
       {props.value}
     </div>
