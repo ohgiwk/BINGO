@@ -81,7 +81,11 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: '-60px',
     textAlign: 'center',
   },
-  backdrop: { zIndex: theme.zIndex.modal + 1, flexDirection: 'column' },
+  backdrop: {
+    zIndex: theme.zIndex.modal + 1,
+    flexDirection: 'column',
+    color: '#fff',
+  },
 }))
 
 export default Layout
