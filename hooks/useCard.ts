@@ -5,7 +5,7 @@ import { useContext, useState } from 'react'
 import { generateNumbers, toCardNumbers, checkBingo, countBingo } from 'common/bingo'
 import API from 'common/API'
 import { THEME_COLORS } from 'common/constants'
-import { Number, Room } from 'common/types'
+import { CardNumber, Room } from 'common/types'
 import { AppContext } from 'contexts/AppContext'
 
 export default function useCard() {
@@ -18,7 +18,7 @@ export default function useCard() {
   } = useContext(AppContext)
 
   const [room, setRoom] = useState<Room>()
-  const [numbers, setNumbers] = useState<Number[]>([])
+  const [numbers, setNumbers] = useState<CardNumber[]>([])
   const [count, setCount] = useState({ bingo: 0, reach: 0 })
   const [isBingo, setIsBingo] = useState<boolean>(false)
 
@@ -83,7 +83,7 @@ export default function useCard() {
    *
    * @param {Number} num
    */
-  function onClickNumber(num: Number) {
+  function onClickNumber(num: CardNumber) {
     if (num.center) return
     const result = checkBingo([
       ...numbers.map((n) => ({ ...n, open: n === num ? !n.open : n.open })),

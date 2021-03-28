@@ -1,7 +1,7 @@
 // prettier-ignore
 import { chunk, shuffle, range, take, transpose, reverse } from './utils'
 
-import { Number } from './types'
+import { CardNumber } from './types'
 
 /**
  *
@@ -47,7 +47,7 @@ function toCardNumbers(numbers: (number | string)[]) {
  *
  * @param numbers
  */
-function checkBingo(numbers: Number[]) {
+function checkBingo(numbers: CardNumber[]) {
   const chunked = [...chunk(numbers, 5)]
   const horizontal = _checkHorizontal(chunked)
   const vertical = transpose(_checkHorizontal([...transpose(chunked)]))
@@ -78,7 +78,7 @@ function checkBingo(numbers: Number[]) {
  * 横のラインでビンゴになっているかチェックする
  * @param array
  */
-function _checkHorizontal(array: Number[][]) {
+function _checkHorizontal(array: CardNumber[][]) {
   return array.map((arr) => {
     const opened = arr.filter((n) => n.open)
     if (opened.length === arr.length) {
@@ -99,7 +99,7 @@ function _checkHorizontal(array: Number[][]) {
  * @param param0
  * @param position
  */
-function _checkDiagonal([...chunked]: Number[][], position: number[]) {
+function _checkDiagonal([...chunked]: CardNumber[][], position: number[]) {
   const array = chunked.map((arr) =>
     arr.map((a) => ({ ...a, reach: false, bingo: false }))
   )
@@ -124,7 +124,7 @@ function _checkDiagonal([...chunked]: Number[][], position: number[]) {
   return array
 }
 
-function countBingo(numbers: Number[]) {
+function countBingo(numbers: CardNumber[]) {
   function count(type: 'bingo' | 'reach') {
     const chunked = [...chunk(numbers, 5)]
     return [

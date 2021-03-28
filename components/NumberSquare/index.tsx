@@ -2,7 +2,7 @@ import { Button } from '@material-ui/core'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import classNames from 'classnames'
 
-import { Number } from 'common/types'
+import { CardNumber } from 'common/types'
 
 const Square = withStyles(() => ({
   root: {
@@ -15,9 +15,9 @@ const Square = withStyles(() => ({
 }))(Button)
 
 const NumberSquare: React.FC<{
-  number: Number
+  number: CardNumber
   history: string[]
-  onClick: (number: Number) => void
+  onClick: (number: CardNumber) => void
 }> = ({ number, history, onClick }) => {
   const classes = useStyles()
 

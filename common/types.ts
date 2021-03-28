@@ -1,4 +1,4 @@
-export type Number = {
+export type CardNumber = {
   number: string
   open: boolean
   reach: boolean
