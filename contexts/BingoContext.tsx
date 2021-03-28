@@ -1,5 +1,4 @@
 import React, { createContext, useState } from 'react'
-import useLocalStorage from '../hooks/useLocalStorage'
 
 interface State {
   openHistoryDrawer: boolean
